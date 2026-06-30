@@ -51,6 +51,7 @@ Thumbs.db
 
 # Misc
 .turbo/
+.workbuddy/
 
 # Sensitive / personal files
 # deploy.ps1 contains real server IP - do not commit
