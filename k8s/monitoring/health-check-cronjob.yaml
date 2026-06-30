@@ -1,0 +1,221 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: health-check-monitor
+  namespace: tradewise
+  labels:
+    app: health-check-monitor
+spec:
+  # Run every minute
+  schedule: "*/1 * * * *"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: health-check-monitor
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: health-checker
+            image: curlimages/curl:8.5.0
+            command:
+            - /bin/sh
+            - -c
+            - |
+              set -e
+              
+              echo "Starting health check at $(date)"
+              
+              # Check backend health
+              echo "Checking backend health..."
+              BACKEND_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" http://tradewise-backend-service:3000/health)
+              
+              if [ "$BACKEND_RESPONSE" != "200" ]; then
+                echo "ERROR: Backend health check failed with status $BACKEND_RESPONSE"
+                exit 1
+              fi
+              
+              echo "Backend health check passed"
+              
+              # Check backend readiness
+              echo "Checking backend readiness..."
+              BACKEND_READY=$(curl -s -o /dev/null -w "%{http_code}" http://tradewise-backend-service:3000/health/ready)
+              
+              if [ "$BACKEND_READY" != "200" ]; then
+                echo "WARNING: Backend readiness check failed with status $BACKEND_READY"
+              else
+                echo "Backend readiness check passed"
+              fi
+              
+              # Check frontend health
+              echo "Checking frontend health..."
+              FRONTEND_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" http://tradewise-frontend-service:80/health)
+              
+              if [ "$FRONTEND_RESPONSE" != "200" ]; then
+                echo "ERROR: Frontend health check failed with status $FRONTEND_RESPONSE"
+                exit 1
+              fi
+              
+              echo "Frontend health check passed"
+              
+              # Check Prometheus
+              echo "Checking Prometheus..."
+              PROMETHEUS_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" http://prometheus:9090/-/healthy)
+              
+              if [ "$PROMETHEUS_RESPONSE" != "200" ]; then
+                echo "WARNING: Prometheus health check failed with status $PROMETHEUS_RESPONSE"
+              else
+                echo "Prometheus health check passed"
+              fi
+              
+              # Check Grafana
+              echo "Checking Grafana..."
+              GRAFANA_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" http://grafana:3000/api/health)
+              
+              if [ "$GRAFANA_RESPONSE" != "200" ]; then
+                echo "WARNING: Grafana health check failed with status $GRAFANA_RESPONSE"
+              else
+                echo "Grafana health check passed"
+              fi
+              
+              echo "All critical health checks passed at $(date)"
+            resources:
+              requests:
+                memory: "32Mi"
+                cpu: "50m"
+              limits:
+                memory: "64Mi"
+                cpu: "100m"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alertmanager-config
+  namespace: tradewise
+data:
+  alertmanager.yml: |
+    global:
+      resolve_timeout: 5m
+      slack_api_url: '${SLACK_WEBHOOK_URL}'
+
+    route:
+      group_by: ['alertname', 'cluster', 'service']
+      group_wait: 10s
+      group_interval: 10s
+      repeat_interval: 12h
+      receiver: 'default'
+      routes:
+      - match:
+          severity: critical
+        receiver: 'critical'
+        continue: true
+      - match:
+          severity: warning
+        receiver: 'warning'
+
+    receivers:
+    - name: 'default'
+      slack_configs:
+      - channel: '#tradewise-alerts'
+        title: 'TradeWise Alert'
+        text: '{{ range .Alerts }}{{ .Annotations.description }}{{ end }}'
+
+    - name: 'critical'
+      slack_configs:
+      - channel: '#tradewise-critical'
+        title: 'CRITICAL: TradeWise Alert'
+        text: '{{ range .Alerts }}{{ .Annotations.description }}{{ end }}'
+        send_resolved: true
+      pagerduty_configs:
+      - service_key: '${PAGERDUTY_SERVICE_KEY}'
+
+    - name: 'warning'
+      slack_configs:
+      - channel: '#tradewise-alerts'
+        title: 'WARNING: TradeWise Alert'
+        text: '{{ range .Alerts }}{{ .Annotations.description }}{{ end }}'
+
+    inhibit_rules:
+    - source_match:
+        severity: 'critical'
+      target_match:
+        severity: 'warning'
+      equal: ['alertname', 'cluster', 'service']
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alertmanager
+  namespace: tradewise
+  labels:
+    app: alertmanager
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alertmanager
+  template:
+    metadata:
+      labels:
+        app: alertmanager
+    spec:
+      containers:
+      - name: alertmanager
+        image: prom/alertmanager:v0.26.0
+        args:
+          - '--config.file=/etc/alertmanager/alertmanager.yml'
+          - '--storage.path=/alertmanager'
+        ports:
+        - containerPort: 9093
+          name: http
+        volumeMounts:
+        - name: config
+          mountPath: /etc/alertmanager
+        - name: storage
+          mountPath: /alertmanager
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /-/healthy
+            port: 9093
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /-/ready
+            port: 9093
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      volumes:
+      - name: config
+        configMap:
+          name: alertmanager-config
+      - name: storage
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: alertmanager
+  namespace: tradewise
+  labels:
+    app: alertmanager
+spec:
+  type: ClusterIP
+  ports:
+  - port: 9093
+    targetPort: 9093
+    protocol: TCP
+    name: http
+  selector:
+    app: alertmanager

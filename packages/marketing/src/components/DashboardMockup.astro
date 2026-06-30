@@ -1,0 +1,247 @@
+﻿---
+import en from '../i18n/en.ts';
+import zh from '../i18n/zh.ts';
+
+interface Props {
+  lang?: 'en' | 'zh';
+}
+
+const { lang = 'en' } = Astro.props;
+const t = lang === 'zh' ? zh : en;
+
+const statsEn = [
+  { label: 'Net Value', value: '$149,820', sub: '+3.4% this week', color: '#00d4aa' },
+  { label: 'Today P&L', value: '+$12,480', sub: 'Win rate 68%', color: '#00d4aa' },
+  { label: 'Max Drawdown', value: '3.2%', sub: 'Risk OK', color: '#f59e0b' },
+];
+const statsZh = [
+  { label: '账户净值 / Net Value', value: '$149,820', sub: '+3.4% 本周', color: '#00d4aa' },
+  { label: '今日盈亏 / Today P&L', value: '+$12,480', sub: '胜率 68%', color: '#00d4aa' },
+  { label: '最大回撤 / Max DD', value: '3.2%', sub: '风险可控', color: '#f59e0b' },
+];
+const stats = lang === 'zh' ? statsZh : statsEn;
+
+const aiItemsEn = [
+  { label: 'Execution Consistency', val: 82 },
+  { label: 'vs Last Week', val: 6 },
+  { label: 'Risk Exposure', val: 45 },
+  { label: 'Concentration Risk', val: 28 },
+  { label: 'Overtrading', val: 62 },
+  { label: '2 Impulsive Trades', val: 0 },
+];
+const aiItemsZh = [
+  { label: '执行一致性', val: 82 },
+  { label: '较上周', val: 6 },
+  { label: '风险敞口', val: 45 },
+  { label: '单笔容量集中风险', val: 28 },
+  { label: '过度交易', val: 62 },
+  { label: '触发 2 次冲动交易', val: 0 },
+];
+const aiItems = lang === 'zh' ? aiItemsZh : aiItemsEn;
+
+const holdings = [
+  { sym: 'BTC/USDT', pnl: '+$1,248', c: '#00d4aa' },
+  { sym: 'NVDA', pnl: '+$382', c: '#00d4aa' },
+  { sym: 'TSLA', pnl: '-$124', c: '#ef4444' },
+];
+
+const chartLabel = lang === 'zh' ? '日线' : 'Daily';
+const aiTitle = lang === 'zh' ? 'AI 置信提示' : 'AI Confidence';
+const liveLabel = lang === 'zh' ? '实时摘要' : 'Live';
+const holdingsLabel = lang === 'zh' ? '监控持仓' : 'Holdings';
+const dashboardLabel = lang === 'zh' ? '仪表板' : 'Dashboard';
+---
+
+<div class="dashboard-mockup">
+  <!-- Title bar -->
+  <div class="mockup-header">
+    <div class="header-dots">
+      <span class="dot dot-red"></span>
+      <span class="dot dot-yellow"></span>
+      <span class="dot dot-green"></span>
+    </div>
+    <span class="header-title">TradeAnchor · {dashboardLabel}</span>
+    <span class="header-live">{t.hero.closeLabel}</span>
+  </div>
+
+  <div class="mockup-body">
+    <!-- Stats row -->
+    <div class="stats-row">
+      {stats.map((s) => (
+        <div class="stat-card">
+          <span class="stat-label">{s.label}</span>
+          <span class="stat-value">{s.value}</span>
+          <span class="stat-sub" style={`color:${s.color}`}>{s.sub}</span>
+        </div>
+      ))}
+    </div>
+
+    <!-- AI Panel + Chart + Holdings -->
+    <div class="main-grid">
+      <!-- AI Panel -->
+      <div class="ai-panel">
+        <div class="ai-panel-header">
+          <span>{aiTitle}</span>
+          <span class="live-badge">{liveLabel}</span>
+        </div>
+        {aiItems.map((item) => (
+          item.val > 0
+            ? (
+              <div class="ai-item">
+                <div class="ai-item-row">
+                  <span class="ai-item-label">{item.label}</span>
+                  <span class={`ai-item-val ${item.val > 60 ? 'val-good' : item.val > 30 ? 'val-warn' : 'val-bad'}`}>{item.val}%</span>
+                </div>
+                <div class="progress-track">
+                  <div class={`progress-fill ${item.val > 60 ? 'fill-good' : item.val > 30 ? 'fill-warm' : 'fill-bad'}`} style={`width:${item.val}%`}></div>
+                </div>
+              </div>
+            )
+            : (
+              <div class="ai-item-zero">{item.label}</div>
+            )
+        ))}
+      </div>
+
+      <!-- Chart + Holdings -->
+      <div class="right-col">
+        <!-- Chart -->
+        <div class="chart-card">
+          <span class="chart-label">BTC/USDT · {chartLabel}</span>
+          <div class="chart-area">
+            <svg viewBox="0 0 200 80" preserveAspectRatio="none" style="width:100%;height:100%">
+              <defs>
+                <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#00d4aa" stop-opacity="0.25" />
+                  <stop offset="100%" stop-color="#00d4aa" stop-opacity="0" />
+                </linearGradient>
+              </defs>
+              <path d="M0,70 C20,65 35,58 50,52 C65,46 80,40 95,38 C110,36 125,28 140,24 C155,20 170,18 190,14 L200,12 L200,80 L0,80 Z" fill="url(#areaGrad)" />
+              <path d="M0,70 C20,65 35,58 50,52 C65,46 80,40 95,38 C110,36 125,28 140,24 C155,20 170,18 190,14 L200,12" fill="none" stroke="#00d4aa" stroke-width="1.5" stroke-linecap="round" />
+            </svg>
+          </div>
+        </div>
+        <!-- Holdings -->
+        <div class="holdings-card">
+          <span class="holdings-label">{holdingsLabel}</span>
+          {holdings.map((h) => (
+            <div class="holding-row">
+              <span>{h.sym}</span>
+              <span class="holding-pnl" style={`color:${h.c}`}>{h.pnl}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .dashboard-mockup {
+    background: #0d1520;
+    border: 1px solid rgba(0,212,170,0.15);
+    border-radius: 14px;
+    overflow: hidden;
+    font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+    font-size: 11px;
+  }
+  .mockup-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem 0.8rem;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .header-dots { display: flex; gap: 6px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-red { background: #ef4444; }
+  .dot-yellow { background: #f59e0b; }
+  .dot-green { background: #22c55e; }
+  .header-title { color: #94a3b8; letter-spacing: 1px; font-size: 11px; }
+  .header-live { color: #00d4aa; font-size: 10px; }
+
+  .mockup-body { padding: 0.75rem; }
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 0.6rem;
+    margin-bottom: 0.75rem;
+  }
+  .stat-card {
+    background: rgba(255,255,255,0.03);
+    border-radius: 8px;
+    padding: 0.6rem;
+  }
+  .stat-label { display: block; font-size: 9px; color: #64748b; margin-bottom: 2px; }
+  .stat-value { display: block; font-size: 15px; font-weight: 700; color: #fff; }
+  .stat-sub { display: block; font-size: 9px; margin-top: 1px; }
+
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem;
+  }
+  .ai-panel {
+    background: rgba(0,212,170,0.05);
+    border-radius: 10px;
+    padding: 0.75rem;
+    height: 100%;
+  }
+  .ai-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+    color: #fff;
+    font-size: 11px;
+  }
+  .live-badge {
+    background: #00d4aa; color: #000;
+    padding: 1px 6px; border-radius: 4px;
+    font-size: 9px; font-weight: 600;
+  }
+  .ai-item { margin-bottom: 0.6rem; }
+  .ai-item-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2px;
+  }
+  .ai-item-label { font-size: 9.5px; color: #94a3b8; }
+  .ai-item-val { font-size: 9.5px; font-weight: 600; }
+  .val-good { color: #00d4aa; }
+  .val-warn { color: #f59e0b; }
+  .val-bad { color: #ef4444; }
+  .progress-track {
+    height: 4px; border-radius: 3px;
+    background: rgba(255,255,255,0.07);
+  }
+  .progress-fill { height: 100%; border-radius: 3px; transition: width 0.3s; }
+  .fill-good { background: #00d4aa; }
+  .fill-warm { background: #f59e0b; }
+  .fill-bad { background: #ef4444; }
+  .ai-item-zero { font-size: 9.5px; color: #ef4444; }
+
+  .right-col { display: flex; flex-direction: column; gap: 0.6rem; }
+  .chart-card { }
+  .chart-label { font-size: 10px; color: #64748b; margin-bottom: 0.5rem; display: block; }
+  .chart-area {
+    height: 90px; position: relative;
+    background: linear-gradient(180deg, rgba(0,212,170,0.12), transparent);
+    border-radius: 8px; overflow: hidden;
+  }
+  .holdings-card {}
+  .holdings-label { font-size: 10px; color: #64748b; margin-bottom: 0.4rem; display: block; }
+  .holding-row {
+    display: flex; justify-content: space-between;
+    padding: 0.3rem 0;
+    border-top: 1px solid rgba(255,255,255,0.04);
+    font-size: 10px;
+  }
+  .holding-pnl { font-weight: 600; }
+
+  @media (max-width: 500px) {
+    .stats-row { grid-template-columns: 1fr; }
+    .main-grid { grid-template-columns: 1fr; }
+  }
+</style>

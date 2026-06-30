@@ -1,0 +1,117 @@
+---
+import en from '../i18n/en.ts';
+import zh from '../i18n/zh.ts';
+
+interface Props {
+  lang?: 'en' | 'zh';
+}
+
+const { lang = 'en' } = Astro.props;
+const t = lang === 'zh' ? zh : en;
+
+const reviews = [
+  { quote: t.testimonials.review1Quote, name: t.testimonials.review1Name, role: t.testimonials.review1Role },
+  { quote: t.testimonials.review2Quote, name: t.testimonials.review2Name, role: t.testimonials.review2Role },
+  { quote: t.testimonials.review3Quote, name: t.testimonials.review3Name, role: t.testimonials.review3Role },
+];
+---
+
+<section class="testimonials-section" id="testimonials">
+  <div class="container">
+    <div class="section-header">
+      <h2>{t.testimonials.sectionTitle}</h2>
+      <p>{t.testimonials.sectionSubtitle}</p>
+    </div>
+
+    <div class="testimonials-grid">
+      {reviews.map((r) => (
+        <article class="testimonial-card">
+          <div class="stars">★★★★★</div>
+          <blockquote>"{r.quote}"</blockquote>
+          <div class="reviewer">
+            <span class="avatar">{r.name.charAt(0)}</span>
+            <div>
+              <strong>{r.name}</strong>
+              <span>{r.role}</span>
+            </div>
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .testimonials-section {
+    padding: 4rem 0;
+    border-top: 1px solid rgba(255,255,255,0.04);
+  }
+  .section-header { text-align: center; margin-bottom: 3rem; }
+  .section-header h2 {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 0.6rem;
+  }
+  .section-header p { font-size: 1rem; color: var(--text-muted); }
+
+  .testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+  }
+  .testimonial-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    transition: transform 0.3s;
+    height: 100%;
+  }
+  .testimonial-card:hover { transform: translateY(-4px); }
+
+  .stars {
+    color: #f59e0b;
+    font-size: 1rem;
+    letter-spacing: 2px;
+    margin-bottom: 1rem;
+  }
+  blockquote {
+    font-size: 0.92rem;
+    color: #cbd5e1;
+    line-height: 1.7;
+    font-style: italic;
+    margin-bottom: 1.5rem;
+  }
+  .reviewer {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .avatar {
+    width: 36px; height: 36px;
+    background: rgba(0,212,170,0.15);
+    color: var(--accent);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.9rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .reviewer strong {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #f1f5f9;
+    line-height: 1.3;
+  }
+  .reviewer span {
+    display: block;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+
+  @media (max-width: 768px) {
+    .testimonials-grid { grid-template-columns: 1fr; max-width: 500px; margin: 0 auto; }
+  }
+</style>

@@ -1,0 +1,18 @@
+﻿User-agent: *
+Allow: /
+
+# Disallow admin/internal paths
+Disallow: /dashboard
+Disallow: /trades
+Disallow: /diary
+Disallow: /playbooks
+Disallow: /settings
+Disallow: /profile
+Disallow: /api/
+
+# Sitemap: core pages only during initial TradeAnchor indexing phase.
+# Switch to sitemap.xml when ready to submit the full site map.
+Sitemap: https://mytradewiseoc.com/sitemap-core.xml
+
+# AI crawler guidance (llms.txt standard)
+# See https://mytradewiseoc.com/llms.txt

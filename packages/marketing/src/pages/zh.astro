@@ -1,0 +1,34 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Navbar from '../components/Navbar.astro';
+import Hero from '../components/Hero.astro';
+import DashboardMockup from '../components/DashboardMockup.astro';
+import StatsBar from '../components/StatsBar.astro';
+import FeaturesGrid from '../components/FeaturesGrid.astro';
+import PricingSection from '../components/PricingSection.astro';
+import CTASection from '../components/CTASection.astro';
+import Footer from '../components/Footer.astro';
+import RiskDisclaimer from '../components/RiskDisclaimer.astro';
+import { t, lang } from '../i18n/zh';
+
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
+---
+
+<BaseLayout
+  title={t.meta.title}
+  description={t.meta.description}
+  canonicalUrl={canonicalUrl}
+  hrefLang="zh"
+>
+  <Navbar />
+  <main>
+    <Hero t={t} />
+    <DashboardMockup t={t} />
+    <StatsBar lang="zh" />
+    <FeaturesGrid features={t.features} />
+    <PricingSection pricing={t.pricing} />
+    <CTASection cta={t.cta} />
+  </main>
+  <RiskDisclaimer text={t.risk} />
+  <Footer footer={t.footer} />
+</BaseLayout>

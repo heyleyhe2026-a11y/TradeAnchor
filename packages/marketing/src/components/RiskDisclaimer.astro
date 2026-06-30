@@ -1,0 +1,45 @@
+---
+import en from '../i18n/en.ts';
+import zh from '../i18n/zh.ts';
+
+interface Props {
+  lang?: 'en' | 'zh';
+}
+
+const { lang = 'en' } = Astro.props;
+const t = lang === 'zh' ? zh : en;
+---
+
+<div class="risk-disclaimer">
+  <span class="risk-icon">⚠️</span>
+  <div class="risk-body">
+    <strong>{t.legal.riskTitle}</strong>
+    <p>{t.legal.riskText}</p>
+  </div>
+</div>
+
+<style>
+  .risk-disclaimer {
+    display: flex;
+    gap: 0.85rem;
+    align-items: flex-start;
+    background: rgba(239,68,68,0.06);
+    border: 1px solid rgba(239,68,68,0.15);
+    border-radius: var(--radius-md);
+    padding: 1rem 1.25rem;
+    margin: 1.5rem auto 0;
+    max-width: 1200px;
+  }
+  .risk-icon { font-size: 1.25rem; flex-shrink: 0; margin-top: 2px; }
+  .risk-body strong {
+    display: block;
+    font-size: 0.9rem;
+    color: #fca5a5;
+    margin-bottom: 0.3rem;
+  }
+  .risk-body p {
+    font-size: 0.83rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+</style>

@@ -1,0 +1,9 @@
+packages:
+  - 'packages/*'
+allowBuilds:
+  '@prisma/engines': false
+  '@scarf/scarf': false
+  '@sentry/profiling-node': false
+  bcrypt: false
+  esbuild: false
+  prisma: false

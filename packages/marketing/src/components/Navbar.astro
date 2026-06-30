@@ -1,0 +1,175 @@
+﻿---
+import en from '../i18n/en.ts';
+import zh from '../i18n/zh.ts';
+
+interface Props {
+  lang?: 'en' | 'zh';
+}
+
+const { lang = 'en' } = Astro.props;
+const t = lang === 'zh' ? zh : en;
+const spaBase = '';
+---
+
+<!-- ═════════ NAVBAR ═════════ -->
+<nav class="navbar" id="navbar">
+  <div class="container-xl nav-inner">
+    <!-- Logo -->
+    <a href={lang === 'zh' ? '/zh' : '/'} class="nav-logo">
+      <span class="logo-icon">▲</span>
+      <strong>TradeAnchor</strong>
+    </a>
+
+    <!-- Nav Links -->
+    <div class="nav-links">
+      <a href="#features" class="nav-link">{t.nav.features}</a>
+      <a href="#pricing" class="nav-link">{t.nav.pricing}</a>
+
+      <!-- Language Switch -->
+      {lang === 'en' ? (
+        <a href="/zh" class="nav-link lang-switch">中文</a>
+      ) : (
+        <a href="/" class="nav-link lang-switch">EN</a>
+      )}
+
+      <a href={`${spaBase}/login`} class="btn btn-ghost">{t.nav.login}</a>
+      <a href={`${spaBase}/register`} class="btn btn-primary">{t.nav.freeStart} →</a>
+    </div>
+
+    <!-- Mobile menu toggle -->
+    <button class="mobile-toggle" aria-label="Menu" id="mobileToggle">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <!-- Mobile menu -->
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#features" class="nav-link mobile-nav-link">{t.nav.features}</a>
+    <a href="#pricing" class="nav-link mobile-nav-link">{t.nav.pricing}</a>
+    <a href={`${spaBase}/login`} class="btn btn-outline mobile-btn">{t.nav.login}</a>
+    <a href={`${spaBase}/register`} class="btn btn-primary mobile-btn">{t.nav.freeStart} →</a>
+  </div>
+</nav>
+
+<style>
+  .navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1100;
+    background: rgba(10, 14, 23, 0.85);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 0.75rem 0;
+  }
+  .nav-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 1.15rem;
+    color: #fff;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+  }
+  .logo-icon {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, #00d4aa 0%, #00a888 100%);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--bg-primary);
+    font-size: 0.7rem;
+  }
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+  }
+  .nav-link {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: color 0.2s;
+    white-space: nowrap;
+  }
+  .nav-link:hover {
+    color: #fff;
+  }
+  .lang-switch {
+    padding: 0.25rem 0.65rem;
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.08);
+    font-size: 0.82rem !important;
+    letter-spacing: 0.5px;
+  }
+  .lang-switch:hover {
+    border-color: rgba(255,255,255,0.25);
+  }
+
+  .btn-ghost {
+    background: transparent;
+    color: #e2e8f0;
+    font-weight: 500;
+    font-size: 0.95rem;
+    padding: 0.5rem 1.2rem;
+    min-width: auto;
+  }
+  .btn-ghost:hover {
+    color: #fff;
+  }
+
+  .mobile-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 4.5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+  }
+  .mobile-toggle span {
+    width: 22px; height: 2px;
+    background: var(--text-secondary);
+    border-radius: 2px;
+    transition: all 0.3s;
+  }
+  .mobile-menu {
+    display: none;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem 1.5rem 1.25rem;
+    background: rgba(10,14,23,0.97);
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .mobile-nav-link {
+    padding: 0.6rem 0;
+    font-size: 1rem;
+  }
+  .mobile-btn {
+    justify-content: center;
+    margin-top: 0.25rem;
+  }
+
+  @media (max-width: 900px) {
+    .nav-links { display: none; }
+    .mobile-toggle { display: flex; }
+    .mobile-menu.open { display: flex; }
+  }
+</style>
+
+<script>
+  // Mobile menu toggle
+  const btn = document.getElementById('mobileToggle');
+  const menu = document.getElementById('mobileMenu');
+  btn?.addEventListener('click', () => menu?.classList.toggle('open'));
+  // Close on link click
+  menu?.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => menu?.classList.remove('open'));
+  });
+</script>

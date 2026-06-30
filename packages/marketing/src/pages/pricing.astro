@@ -1,0 +1,84 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Navbar from '../components/Navbar.astro';
+import PricingSection from '../components/PricingSection.astro';
+import CTASection from '../components/CTASection.astro';
+import Footer from '../components/Footer.astro';
+import RiskDisclaimer from '../components/RiskDisclaimer.astro';
+
+// Load both languages for pricing page (user can switch)
+import { t as enT } from '../i18n/en';
+import { t as zhT } from '../i18n/zh';
+
+const lang = Astro.url.pathname.startsWith('/zh') ? 'zh' : 'en';
+const t = lang === 'zh' ? zhT : enT;
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
+---
+
+<BaseLayout
+  title={t.meta.pricingTitle}
+  description={t.meta.pricingDesc}
+  canonicalUrl={canonicalUrl}
+>
+  <Navbar />
+  <main class="pricing-page">
+    <div class="container" style="max-width: 1100px; margin: 0 auto; padding: 80px 20px;">
+      <!-- Page Header -->
+      <header style="text-align: center; margin-bottom: 60px;">
+        <h1 style="font-size: 2.8rem; font-weight: 800; color: var(--text-primary); margin-bottom: 16px; line-height: 1.2;">
+          {lang === 'zh' ? '选择适合你的方案' : 'Choose Your Plan'}
+        </h1>
+        <p style="font-size: 1.15rem; color: var(--text-secondary); max-width: 600px; margin: 0 auto; line-height: 1.6;">
+          {lang === 'zh'
+            ? '透明定价，按需付费。所有方案均包含核心交易分析功能。'
+            : 'Transparent, pay-as-you-go pricing. All plans include core trading analytics.'}
+        </p>
+      </header>
+
+      <!-- Pricing Cards -->
+      <PricingSection pricing={t.pricing} />
+
+      <!-- FAQ Section -->
+      <section style="margin-top: 80px; text-align: center;">
+        <h2 style="font-size: 2rem; font-weight: 700; color: var(--text-primary); margin-bottom: 40px;">
+          {lang === 'zh' ? '常见问题' : 'Frequently Asked Questions'}
+        </h2>
+        <div style="max-width: 720px; margin: 0 auto; text-align: left;">
+          {(lang === 'zh'
+            ? [
+                { q: '积分如何使用？', a: '积分用于解锁 AI 分析报告、高级社区内容和特殊功能。不同操作消耗不同积分。' },
+                { q: '可以随时升级吗？', a: '当然！您可以随时购买更多积分或升级到更高套餐，剩余积分会自动保留。' },
+                { q: '支持退款吗？', a: '我们提供 7 天无理由退款保证。详见退款政策页面。' },
+              ]
+            : [
+                { q: 'How do credits work?', a: 'Credits unlock AI reports, premium community content, and special features. Different actions consume different amounts.' },
+                { q: 'Can I upgrade anytime?', a: 'Absolutely! Purchase more credits or upgrade anytime. Your remaining credits are always preserved.' },
+                { q: 'Is there a refund policy?', a: 'Yes, we offer a 7-day money-back guarantee. See our Refund Policy for details.' },
+              ]
+          ).map((item) => (
+            <details style="
+              background: var(--bg-card);
+              border: 1px solid var(--border-color);
+              border-radius: 12px;
+              padding: 20px 24px;
+              margin-bottom: 12px;
+              cursor: pointer;
+              transition: all 0.2s;
+            ">
+              <summary style="font-weight: 600; color: var(--text-primary); list-style: none; display: flex; justify-content: space-between; align-items: center;">
+                {item.q}
+                <span style="color: var(--primary);">+</span>
+              </summary>
+              <p style="margin-top: 12px; color: var(--text-secondary); line-height: 1.6;">{item.a}</p>
+            </details>
+          ))}
+        </div>
+      </section>
+
+      <!-- CTA -->
+      <CTASection cta={t.cta} />
+    </div>
+  </main>
+  <RiskDisclaimer text={t.risk} />
+  <Footer footer={t.footer} />
+</BaseLayout>

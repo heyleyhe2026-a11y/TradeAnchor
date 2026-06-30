@@ -1,0 +1,578 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Enums
+enum SubscriptionTier {
+  free
+  pro
+  prem
+}
+
+enum SubscriptionStatus {
+  active
+  cancelled
+  expired
+  grace_period
+}
+
+enum PositionDirection {
+  long
+  short
+}
+
+enum PnlSource {
+  calculated
+  broker
+}
+
+enum CreditSource {
+  trade_creation
+  consecutive_days
+  ai_usage
+  registration_bonus
+  admin_grant
+  task_reward
+  attachment_download_reward
+}
+
+enum TaskCategory {
+  newbie
+  advanced
+}
+
+enum TaskStatus {
+  pending
+  in_progress
+  completed
+  claimed
+}
+
+enum PaymentMethod {
+  paypal
+  visa
+  usdt
+  fastspring
+  creem
+}
+
+enum PaymentStatus {
+  pending
+  completed
+  failed
+  refunded
+}
+
+enum PlaybookStatus {
+  draft
+  pending_review
+  published
+  rejected
+}
+
+enum AuditAction {
+  login
+  logout
+  registration
+  password_change
+  subscription_upgrade
+  subscription_downgrade
+  subscription_cancel
+  payment_initiated
+  payment_completed
+  payment_failed
+  refund_requested
+  playbook_published
+  playbook_purchased
+  data_export
+  trade_created
+}
+
+// Models
+enum AuthProvider {
+  local
+  google
+  github
+  amazon
+}
+
+model User {
+  id                    String        @id @default(uuid())
+  email                 String        @unique
+  passwordHash          String?       @map("password_hash")
+  provider              AuthProvider   @default(local)
+  providerId            String?       @map("provider_id")
+  avatarUrl             String?       @map("avatar_url")
+  displayName           String?       @map("display_name")
+  countryCode           String        @map("country_code")
+  locale                String        @default("en")
+  timezone              String        @default("UTC")
+  emailVerified         Boolean       @default(false) @map("email_verified")
+  verificationToken     String?       @map("verification_token")
+  verificationExpiresAt DateTime?     @map("verification_expires_at")
+  createdAt             DateTime      @default(now()) @map("created_at")
+  updatedAt             DateTime      @updatedAt @map("updated_at")
+  lastLoginAt           DateTime?     @map("last_login_at")
+  failedLoginAttempts   Int           @default(0) @map("failed_login_attempts")
+  accountLockedUntil    DateTime?     @map("account_locked_until")
+  signupChannel         String?       @map("signup_channel")
+  signupUtmSource       String?       @map("signup_utm_source")
+  signupUtmMedium       String?       @map("signup_utm_medium")
+  signupUtmCampaign     String?       @map("signup_utm_campaign")
+  signupUtmTerm         String?       @map("signup_utm_term")
+  signupUtmContent      String?       @map("signup_utm_content")
+  signupReferrer        String?       @map("signup_referrer") @db.VarChar(500)
+  signupLandingPage     String?       @map("signup_landing_page") @db.VarChar(500)
+
+  // Relations
+  subscriptions       Subscription[]
+  trades              Trade[]
+  credits             Credit[]
+  payments            Payment[]
+  diaryEntries        DiaryEntry[]
+  playbooks           Playbook[]
+  playbookPurchases   PlaybookPurchase[]     @relation("PlaybookBuyer")
+  playbookSales       PlaybookPurchase[]     @relation("PlaybookSeller")
+  auditLogs           AuditLog[]
+  preferences         UserPreference?
+  taskProgress        UserTaskProgress[]
+  userBadges          UserBadge[]
+  playbookRatings     PlaybookRating[]
+  postViews           PostView[]
+  favorites           PlaybookFavorite[]
+  likes               PlaybookLike[]
+  comments            PlaybookComment[]
+
+  @@index([email])
+  @@index([verificationToken])
+  @@map("users")
+}
+
+model Subscription {
+  id                  String             @id @default(uuid())
+  userId              String             @map("user_id")
+  tier                SubscriptionTier   @default(free)
+  status              SubscriptionStatus @default(active)
+  startedAt           DateTime           @default(now()) @map("started_at")
+  expiresAt           DateTime?          @map("expires_at")
+  autoRenew           Boolean            @default(true) @map("auto_renew")
+  cancelledAt         DateTime?          @map("cancelled_at")
+  // FastSpring integration fields
+  fsSubscriptionId    String?            @unique @map("fs_subscription_id")   // FastSpring subscription reference ID
+  fsProductId         String?            @map("fs_product_id")                // e.g. "advanced" or "professional"
+  fsOrderId           String?            @map("fs_order_id")                   // latest order ID from FS
+  createdAt           DateTime           @default(now()) @map("created_at")
+  updatedAt           DateTime           @updatedAt @map("updated_at")
+
+  // Relations
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payments Payment[]
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("subscriptions")
+}
+
+model Trade {
+  id                String            @id @default(uuid())
+  userId            String            @map("user_id")
+  tradingSymbol     String            @map("trading_symbol")
+  positionDirection PositionDirection @map("position_direction")
+  entryPrice        Decimal           @map("entry_price") @db.Decimal(18, 8)
+  exitPrice         Decimal?          @map("exit_price") @db.Decimal(18, 8)
+  quantity          Decimal           @db.Decimal(18, 8)
+  leverage          Decimal           @default(1) @db.Decimal(10, 2)
+  pnl               Decimal?          @db.Decimal(18, 8)
+  commission        Decimal?          @map("commission") @db.Decimal(18, 8)
+  quoteCurrency     String            @default("USD") @map("quote_currency") @db.VarChar(3)
+  swap              Decimal?          @db.Decimal(18, 8)
+  pnlSource         PnlSource         @default(calculated) @map("pnl_source")
+  importSource      String?           @map("import_source")
+  sourceTimezone    String?           @map("source_timezone")
+  externalTicketId  String?           @map("external_ticket_id")
+  importBatchId     String?           @map("import_batch_id")
+  entryTimestamp    DateTime          @map("entry_timestamp")
+  exitTimestamp     DateTime?         @map("exit_timestamp")
+  createdAt         DateTime          @default(now()) @map("created_at")
+  updatedAt         DateTime          @updatedAt @map("updated_at")
+
+  // Relations
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([tradingSymbol])
+  @@index([entryTimestamp])
+  @@index([userId, exitTimestamp])
+  @@index([userId, quoteCurrency])
+  @@index([importBatchId])
+  @@unique([userId, importSource, externalTicketId])
+  @@map("trades")
+}
+
+model Credit {
+  id          String       @id @default(uuid())
+  userId      String       @map("user_id")
+  amount      Int
+  source      CreditSource
+  taskKey     String?      @map("task_key")
+  description String?                       // human-readable reason (e.g. "验证邮箱获得+50积分", "生成AI报告消耗-100积分")
+  earnedAt    DateTime     @default(now()) @map("earned_at")
+  expiresAt   DateTime     @map("expires_at")
+  consumed    Boolean      @default(false)
+  consumedAt  DateTime?    @map("consumed_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@index([consumed])
+  @@index([userId, source, taskKey, earnedAt])
+  @@map("credits")
+}
+
+model Payment {
+  id                   String        @id @default(uuid())
+  userId               String        @map("user_id")
+  subscriptionId       String?       @map("subscription_id")
+  amount               Decimal       @db.Decimal(10, 2)
+  currency             String        @default("USD")
+  paymentMethod        PaymentMethod @map("payment_method")
+  status               PaymentStatus @default(pending)
+  gatewayTransactionId String?       @map("gateway_transaction_id")
+  gatewayResponse      Json?         @map("gateway_response")
+  // FastSpring specific
+  fsOrderId            String?       @unique @map("fs_order_id")           // FS order reference ID
+  fsInvoiceUrl         String?       @map("fs_invoice_url")                // link to invoice PDF
+  createdAt            DateTime      @default(now()) @map("created_at")
+  completedAt          DateTime?     @map("completed_at")
+  refundedAt           DateTime?     @map("refunded_at")
+  refundReason         String?       @map("refund_reason")
+
+  // Relations
+  user               User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscription       Subscription?      @relation(fields: [subscriptionId], references: [id])
+  playbookPurchases  PlaybookPurchase[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([gatewayTransactionId])
+  @@map("payments")
+}
+
+model DiaryEntry {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  title     String
+  content   String
+  tradeIds  String[] @map("trade_ids")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt(sort: Desc)])
+  @@map("diary_entries")
+}
+
+model Playbook {
+  id              String         @id @default(uuid())
+  userId          String         @map("user_id")
+  title           String
+  description     String?
+  content         String
+  paidContent     String?        @map("paid_content")
+  price           Decimal?       @db.Decimal(10, 2)
+  status          PlaybookStatus @default(draft)
+  tags            String[]
+  tradingSymbols  String[]       @map("trading_symbols")
+  purchaseCount   Int            @default(0) @map("purchase_count")
+  attachments     Json?          // Array of { originalName, filename, path, size, mimetype }
+  createdAt       DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @updatedAt @map("updated_at")
+  publishedAt     DateTime?      @map("published_at")
+
+  // Relations
+  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  purchases PlaybookPurchase[]
+  ratings   PlaybookRating[]
+  comments  PlaybookComment[]
+  postViews PostView[]
+  favorites PlaybookFavorite[]
+  likes     PlaybookLike[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([publishedAt(sort: Desc)])
+  @@map("playbooks")
+}
+
+model PlaybookPurchase {
+  id                 String   @id @default(uuid())
+  playbookId         String   @map("playbook_id")
+  buyerId            String   @map("buyer_id")
+  sellerId           String   @map("seller_id")
+  amount             Decimal  @db.Decimal(10, 2)
+  platformCommission Decimal  @map("platform_commission") @db.Decimal(10, 2)
+  sellerRevenue      Decimal  @map("seller_revenue") @db.Decimal(10, 2)
+  paymentId          String?  @map("payment_id")
+  purchasedAt        DateTime @default(now()) @map("purchased_at")
+
+  // Relations
+  playbook Playbook @relation(fields: [playbookId], references: [id], onDelete: Cascade)
+  buyer    User     @relation("PlaybookBuyer", fields: [buyerId], references: [id], onDelete: Cascade)
+  seller   User     @relation("PlaybookSeller", fields: [sellerId], references: [id])
+  payment  Payment? @relation(fields: [paymentId], references: [id])
+
+  @@unique([playbookId, buyerId])
+  @@index([buyerId])
+  @@index([sellerId])
+  @@index([playbookId])
+  @@map("playbook_purchases")
+}
+
+model AuditLog {
+  id           String       @id @default(uuid())
+  userId       String?      @map("user_id")
+  action       AuditAction
+  resourceType String?      @map("resource_type")
+  resourceId   String?      @map("resource_id")
+  ipAddress    String?      @map("ip_address")
+  userAgent    String?      @map("user_agent")
+  metadata     Json?
+  flagged      Boolean      @default(false)
+  createdAt    DateTime     @default(now()) @map("created_at")
+
+  // Relations
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt(sort: Desc)])
+  @@index([flagged])
+  @@map("audit_logs")
+}
+
+model UserPreference {
+  userId                        String   @id @map("user_id")
+  locale                        String   @default("en")
+  timezone                      String   @default("UTC")
+  currencyFormat                String   @default("USD") @map("currency_format")
+  calendarDayBasis              String   @default("exit") @map("calendar_day_basis")
+  leaderboardOptIn              Boolean  @default(true) @map("leaderboard_opt_in")
+  notificationEmail             Boolean  @default(true) @map("notification_email")
+  notificationSubscription      Boolean  @default(true) @map("notification_subscription")
+  notificationPlaybook          Boolean  @default(true) @map("notification_playbook")
+  notificationCreditsExpiring   Boolean  @default(true) @map("notification_credits_expiring")
+  dashboardFilters              Json?    @map("dashboard_filters")
+  dashboardLayout               Json?    @map("dashboard_layout")
+  createdAt                     DateTime @default(now()) @map("created_at")
+  updatedAt                     DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_preferences")
+}
+
+model FxRate {
+  id           String   @id @default(uuid())
+  rateDate     DateTime @map("rate_date") @db.Date
+  fromCurrency String   @map("from_currency") @db.VarChar(3)
+  toCurrency   String   @map("to_currency") @db.VarChar(3)
+  rate         Decimal  @db.Decimal(18, 8)
+  source       String   @default("ecb")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@unique([rateDate, fromCurrency, toCurrency])
+  @@map("fx_rates")
+}
+
+// ===== Task & Reward System =====
+
+model Task {
+  id          String       @id @default(uuid())
+  key         String       @unique   // unique identifier like "first_trade", "ai_chat_5"
+  category    TaskCategory
+  title       String        // display title (en)
+  titleZh     String?       // display title (zh)
+  description String        // description (en)
+  descriptionZh String?     // description (zh)
+  targetCount Int           @default(1)   // how many actions needed to complete
+  creditReward Int          @default(100) // credits awarded on completion
+  energyReward Int          @default(5)   // energy points awarded
+  badgeKey    String?       // badge key to award on completion
+  icon        String?       // MUI icon name or emoji
+  sortOrder    Int           @default(0)
+  isActive    Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+
+  progress    UserTaskProgress[]
+
+  @@map("tasks")
+}
+
+model UserTaskProgress {
+  id            String     @id @default(uuid())
+  userId        String     @map("user_id")
+  taskId        String     @map("task_id")
+  status        TaskStatus @default(pending)
+  currentCount  Int        @default(0)   // current progress count
+  startedAt     DateTime?
+  completedAt   DateTime?
+  claimedAt     DateTime?
+
+  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  task          Task       @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, taskId])
+  @@index([userId])
+  @@index([status])
+  @@map("user_task_progress")
+}
+
+model Badge {
+  id          String   @id @default(uuid())
+  key         String   @unique   // e.g. "first_trade_badge"
+  name        String              // display name (en)
+  nameZh      String?             // display name (zh)
+  description String?             // description (en)
+  descriptionZh String?           // description (zh)
+  icon        String              // emoji or icon identifier
+  color       String   @default("#E5A23C")
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+
+  userBadges  UserBadge[]
+
+  @@map("badges")
+}
+
+model UserBadge {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  badgeId   String   @map("badge_id")
+  earnedAt  DateTime @default(now()) @map("earned_at")
+  sourceTaskId String? @map("source_task_id")
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badge     Badge    @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, badgeId])
+  @@index([userId])
+  @@map("user_badges")
+}
+
+// ===== Strategy Rating System =====
+
+model PlaybookRating {
+  id          String   @id @default(uuid())
+  playbookId  String   @map("playbook_id")
+  userId      String   @map("user_id")
+  rating      Int                    // 1-5 stars
+  comment     String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  playbook    Playbook @relation(fields: [playbookId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([playbookId, userId]) // one rating per user per playbook
+  @@index([playbookId])
+  @@index([userId])
+  @@map("playbook_ratings")
+}
+
+model PostView {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  playbookId String  @map("playbook_id")
+  viewedAt  DateTime @default(now()) @map("viewed_at")
+
+  // Relations
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  playbook Playbook @relation(fields: [playbookId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, playbookId])
+  @@index([userId])
+  @@index([playbookId])
+  @@map("post_views")
+}
+
+model PlaybookFavorite {
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  playbookId String   @map("playbook_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  playbook  Playbook @relation(fields: [playbookId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, playbookId])
+  @@index([userId])
+  @@index([playbookId])
+  @@map("playbook_favorites")
+}
+
+model PlaybookLike {
+  id         String   @id @default(uuid())
+  userId     String   @map("user_id")
+  playbookId String   @map("playbook_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  playbook Playbook @relation(fields: [playbookId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, playbookId])
+  @@index([userId])
+  @@index([playbookId])
+  @@map("playbook_likes")
+}
+
+model PlaybookComment {
+  id          String           @id @default(uuid())
+  playbookId  String           @map("playbook_id")
+  userId      String           @map("user_id")
+  content     String
+  parentId    String?          @map("parent_id")       // null = top-level comment, set = reply
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @updatedAt @map("updated_at")
+
+  // Relations
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  playbook    Playbook         @relation(fields: [playbookId], references: [id], onDelete: Cascade)
+  parent      PlaybookComment? @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies     PlaybookComment[] @relation("CommentReplies")
+
+  @@index([playbookId])
+  @@index([userId])
+  @@index([parentId])
+  @@map("playbook_comments")
+}
+
+model ContentTranslation {
+  id           String   @id @default(uuid())
+  entityType   String   @map("entity_type")   // playbook | comment
+  entityId     String   @map("entity_id")
+  field        String                          // title | description | content | paidContent
+  sourceLocale String   @map("source_locale") // en | zh
+  targetLocale String   @map("target_locale") // en | zh
+  sourceHash   String   @map("source_hash")
+  translated   String   @db.Text
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@unique([entityType, entityId, field, targetLocale, sourceHash])
+  @@index([entityType, entityId, targetLocale])
+  @@map("content_translations")
+}

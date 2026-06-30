@@ -1,0 +1,93 @@
+---
+import en from '../i18n/en.ts';
+import zh from '../i18n/zh.ts';
+
+interface Props {
+  lang?: 'en' | 'zh';
+}
+
+const { lang = 'en' } = Astro.props;
+const t = lang === 'zh' ? zh : en;
+---
+
+<section class="stats-bar">
+  <div class="container-xl">
+    <div class="stats-grid" id="statsGrid" data-lang={lang}>
+      {t.staticStats.map((s) => (
+        <div class="stat-item">
+          <span class="stat-num">{s.num}</span>
+          <span class="stat-label">{s.label}</span>
+          <span class="stat-sub">{s.sub}</span>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script define:vars={{ statsLabels: t.stats }}>
+  const grid = document.getElementById('statsGrid');
+  if (!grid) return;
+
+  const fmt = new Intl.NumberFormat(grid.dataset.lang === 'zh' ? 'zh-CN' : 'en-US');
+
+  function appendStat(num, label, sub) {
+    const item = document.createElement('div');
+    item.className = 'stat-item';
+    item.innerHTML = `
+      <span class="stat-num">${num}</span>
+      <span class="stat-label">${label}</span>
+      <span class="stat-sub">${sub}</span>
+    `;
+    grid.prepend(item);
+  }
+
+  fetch('/api/v1/public/stats')
+    .then((res) => (res.ok ? res.json() : null))
+    .then((json) => {
+      if (!json?.success || typeof json.data?.userCount !== 'number') return;
+      const { userCount, tradeCount = 0, communityPostCount = 0 } = json.data;
+      appendStat(fmt.format(communityPostCount), statsLabels.communityPosts, statsLabels.liveMetric);
+      appendStat(fmt.format(tradeCount), statsLabels.tradesLogged, statsLabels.liveMetric);
+      appendStat(fmt.format(userCount), statsLabels.registeredTraders, statsLabels.liveMetric);
+    })
+    .catch(() => {});
+</script>
+
+<style>
+  .stats-bar {
+    border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+    padding: 1.25rem 0;
+  }
+  .stats-grid {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+  }
+  .stat-item {
+    text-align: left;
+    padding: 0 0.5rem;
+  }
+  .stat-num {
+    display: block;
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--accent);
+  }
+  .stat-label {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+  }
+  .stat-sub {
+    display: block;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+  }
+
+  @media (max-width: 768px) {
+    .stats-grid { justify-content: flex-start; }
+  }
+</style>

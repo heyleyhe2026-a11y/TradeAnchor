@@ -1,0 +1,62 @@
+{
+  "name": "tradeanchor",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI-driven trading journal platform for retail traders",
+  "scripts": {
+    "dev": "pnpm --parallel --stream run dev",
+    "build": "pnpm --recursive run build",
+    "test": "pnpm --recursive run test",
+    "lint": "pnpm --recursive run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "prepare": "husky install"
+  },
+  "keywords": [
+    "trading",
+    "journal",
+    "ai",
+    "finance"
+  ],
+  "author": "TradeAnchor Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/jspdf": "^2.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.2.0",
+    "prettier": "^3.2.4",
+    "tsx": "^4.22.1",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.96.0",
+    "@google/generative-ai": "^0.24.1",
+    "@mui/x-date-pickers": "^9.2.0",
+    "@prisma/adapter-pg": "^7.8.0",
+    "@prisma/client-runtime-utils": "^7.8.0",
+    "@types/passport": "^1.0.17",
+    "@types/passport-github2": "^1.2.9",
+    "@types/passport-google-oauth20": "^2.0.17",
+    "@types/passport-oauth2": "^1.8.0",
+    "date-fns": "^4.2.1",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^4.2.1",
+    "openai": "^6.38.0",
+    "passport": "^0.7.0",
+    "passport-github2": "^0.1.12",
+    "passport-google-oauth20": "^2.0.0",
+    "passport-oauth2": "^1.8.0",
+    "pg": "^8.21.0",
+    "react-markdown": "^10.1.0",
+    "recharts": "^3.8.1"
+  }
+}

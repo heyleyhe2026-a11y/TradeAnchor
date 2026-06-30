@@ -1,0 +1,95 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+dist/
+build/
+out/
+.next/
+.nuxt/
+
+# Testing
+coverage/
+.nyc_output/
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+.cache/
+.temp/
+
+# TypeScript
+*.tsbuildinfo
+
+# Misc
+.turbo/
+
+# Sensitive / personal files
+# deploy.ps1 contains real server IP - do not commit
+deploy.ps1
+
+# AI development configuration
+.kiro/
+
+# User uploaded / generated data
+uploads/
+packages/backend/uploads/
+
+# Resume / personal assets (not part of the project)
+resume_assets/
+resume_icons/
+resume_photo.png
+tmp_resume_photo
+tmp_resume_photo.png
+
+# Data files
+crypto_trades.csv
+sample_trades.csv
+xauusd_trades.csv
+*.csv
+
+# Archives
+*.tar.gz
+*.zip
+
+# Temporary SQL files
+tmp_*.sql
+
+# Docker data volumes
+data/
+postgres_data/
+redis_data/
+mongodb_data/
+prometheus_data/
+grafana_data/
+
+# Third-party EA collection (large, not part of core project)
+scripts/ea/

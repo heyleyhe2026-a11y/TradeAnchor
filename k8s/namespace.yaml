@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: tradewise
+  labels:
+    name: tradewise
+    environment: production

@@ -1,0 +1,100 @@
+﻿---
+import en from '../i18n/en.ts';
+import zh from '../i18n/zh.ts';
+
+interface Props {
+  lang?: 'en' | 'zh';
+}
+
+const { lang = 'en' } = Astro.props;
+const t = lang === 'zh' ? zh : en;
+---
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <!-- Brand -->
+    <a href={lang === 'zh' ? '/zh' : '/'} class="footer-brand">
+      <span class="footer-logo">▲</span>
+      <div class="footer-brand-text">
+        <strong>TradeAnchor</strong>
+        <small>{t.footer.brandTagline}</small>
+      </div>
+    </a>
+
+    <!-- Links -->
+    <div class="footer-links">
+      <a href="/terms">Terms of Service</a>
+      <a href="/privacy">Privacy Policy</a>
+      <a href="/refund">Refund Policy</a>
+    </div>
+
+    <!-- Copyright -->
+    <span class="copyright">{t.footer.copyright}</span>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding: 1.5rem 0;
+    background: rgba(10,14,23,0.6);
+  }
+  .footer-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+  }
+  .footer-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+  }
+  .footer-logo {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg,#00d4aa 0%,#00a888 100%);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--bg-primary);
+    font-size: 0.65rem;
+    flex-shrink: 0;
+  }
+  .footer-brand-text strong {
+    display: block;
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #f1f5f9;
+    letter-spacing: -0.3px;
+    line-height: 1.2;
+  }
+  .footer-brand-text small {
+    display: block;
+    font-size: 0.67rem;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+
+  .footer-links {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+  }
+  .footer-links a {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--accent); }
+
+  .copyright {
+    font-size: 0.72rem;
+    color: #475569;
+  }
+
+  @media (max-width: 650px) {
+    .footer-inner { flex-direction: column; text-align: center; }
+  }
+</style>

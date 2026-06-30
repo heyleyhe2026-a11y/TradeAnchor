@@ -1,0 +1,215 @@
+﻿---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+import RiskDisclaimer from '../components/RiskDisclaimer.astro';
+
+import { t as enT } from '../i18n/en';
+import { t as zhT } from '../i18n/zh';
+
+const lang = Astro.url.pathname.startsWith('/zh') ? 'zh' : 'en';
+const t = lang === 'zh' ? zhT : enT;
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
+
+const refundContent = lang === 'zh'
+  ? {
+      title: '退款政策',
+      lastUpdated: '最后更新：2026 年 6 月 5 日',
+      sections: [
+        {
+          heading: '7 天无理由退款保证',
+          items: [
+            '自购买之日起 7 天内，如对服务不满意，可申请全额退款。',
+            '退款将原路返回至您的支付账户，处理时间通常为 3-5 个工作日。',
+          ],
+        },
+        {
+          heading: '退款条件',
+          items: [
+            '申请时账户处于正常状态（未被封禁）。',
+            '未滥用平台资源或违反服务条款。',
+            '首次购买的用户享有无条件 7 天退款权。',
+            '非首次购买的退款申请将根据具体情况审核。',
+          ],
+        },
+        {
+          heading: '不予退款的情况',
+          items: [
+            '购买已超过 7 天期限。',
+            '因用户违反服务条款导致账户被封禁或功能被限制的情况。',
+            '仅使用部分积分后要求退款的（按实际使用比例计算扣除费用后退还余额）。',
+            '通过促销活动获得的优惠套餐（除非活动另有说明）。',
+            '恶意或重复的退款申请。',
+          ],
+        },
+        {
+          heading: '如何申请退款',
+          items: [
+            '发送邮件至 refund@mytradewiseoc.com，邮件标题请注明"退款申请 - [您的注册邮箱]"。',
+            '请在邮件中说明：注册邮箱、购买日期、购买金额、退款原因。',
+            '我们将在 2 个工作日内回复并处理您的申请。',
+          ],
+        },
+        {
+          heading: '退款处理流程',
+          items: [
+            '收到申请后 24 小时内：确认收到并发送确认邮件。',
+            '2 个工作日内：审核并通过或拒绝申请。',
+            '批准后 3-5 个工作日：款项退回原支付渠道（具体到账时间取决于银行/支付机构）。',
+          ],
+        },
+        {
+          heading: '部分退款政策',
+          items: [
+            '如果已使用部分积分，退款金额 = 支付金额 - (已使用积分 / 购买总积分 × 支付金额)。',
+            '例如：支付 ¥99 获得 1000 积分，使用了 300 积分 → 退款金额 = ¥99 - (300/1000 × ¥99) = ¥69.30',
+          ],
+        },
+        {
+          heading: '联系我们',
+          items: [
+            '退款相关咨询：refund@mytradewiseoc.com',
+            '如有争议，可通过客服邮箱 support@mytradewiseoc.com 提起申诉。',
+          ],
+        },
+      ],
+    }
+  : {
+      title: 'Refund Policy',
+      lastUpdated: 'Last updated: June 5, 2026',
+      sections: [
+        {
+          heading: '7-Day Money-Back Guarantee',
+          items: [
+            'Within 7 days of purchase, if you are not satisfied with the service, you may request a full refund.',
+            'Refunds will be returned to your original payment method, typically within 3-5 business days.',
+          ],
+        },
+        {
+          heading: 'Refund Eligibility',
+          items: [
+            'Your account must be in good standing (not suspended or banned) at the time of request.',
+            'You have not abused platform resources or violated Terms of Service.',
+            'First-time purchasers are eligible for unconditional 7-day refunds.',
+            'Subsequent purchase refund requests will be reviewed on a case-by-case basis.',
+          ],
+        },
+        {
+          heading: 'Non-Refundable Cases',
+          items: [
+            'Requests made more than 7 days after the purchase date.',
+            'Accounts suspended or restricted due to violation of Terms of Service.',
+            'Partial usage requests (proportional deduction based on actual usage applies).',
+            'Promotional packages unless otherwise stated in the promotion terms.',
+            'Fraudulent or repeated refund requests.',
+          ],
+        },
+        {
+          heading: 'How to Request a Refund',
+          items: [
+            'Send an email to refund@mytradewiseoc.com with subject line "Refund Request - [Your Registered Email]".',
+            'Please include in the email: registered email, purchase date, amount, and reason for refund.',
+            'We will respond and process your request within 2 business days.',
+          ],
+        },
+        {
+          heading: 'Refund Processing Timeline',
+          items: [
+            'Within 24 hours of receipt: Confirmation email acknowledging your request.',
+            'Within 2 business days: Review and approval or rejection of request.',
+            'After approval: 3-5 business days for funds to return to original payment channel (actual timing depends on bank/payment processor).',
+          ],
+        },
+        {
+          heading: 'Pro-Rata Refund Policy',
+          items: [
+            'If credits have been used, refund amount = Payment amount - (credits used / total credits purchased × payment amount).',
+            'Example: Paid $12.99 for 1,000 credits, used 300 → Refund = $12.99 - (300/1000 × $12.99) = $9.10',
+          ],
+        },
+        {
+          heading: 'Contact Us',
+          items: [
+            'Refund inquiries: refund@mytradewiseoc.com',
+            'For disputes, contact our support at support@mytradewiseoc.com to file an appeal.',
+          ],
+        },
+      ],
+    };
+---
+
+<BaseLayout
+  title={refundContent.title + ' - TradeAnchor'}
+  description={refundContent.title}
+  canonicalUrl={canonicalUrl}
+>
+  <Navbar />
+  <main class="legal-page">
+    <div class="container" style="max-width: 800px; margin: 0 auto; padding: 80px 20px 40px;">
+      <header style="text-align: center; margin-bottom: 48px;">
+        <h1 style="font-size: 2.4rem; font-weight: 800; color: var(--text-primary); margin-bottom: 8px;">
+          {refundContent.title}
+        </h1>
+        <p style="font-size: 0.9rem; color: var(--text-secondary);">{refundContent.lastUpdated}</p>
+      </header>
+
+      <!-- Highlight box for guarantee -->
+      <div style="
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(59, 130, 246, 0.08));
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        border-radius: 16px;
+        padding: 28px 32px;
+        margin-bottom: 40px;
+        text-align: center;
+      ">
+        <div style="font-size: 2.5rem; margin-bottom: 8px;">🛡️</div>
+        <h2 style="
+          font-size: 1.4rem;
+          font-weight: 700;
+          color: var(--text-primary);
+          margin-bottom: 8px;
+        ">{refundContent.sections[0].heading}</h2>
+        {refundContent.sections[0].items.map((item) => (
+          <p style="color: var(--text-secondary); line-height: 1.7; margin: 4px 0;">{item}</p>
+        ))}
+      </div>
+
+      {refundContent.sections.slice(1).map((section) => (
+        <section style="margin-bottom: 32px;">
+          <h2 style="
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary);
+            margin-bottom: 16px;
+          ">{section.heading}</h2>
+          <ul style="list-style: none; padding: 0; margin: 0;">
+            {section.items.map((item) => (
+              <li style="
+                color: var(--text-secondary);
+                line-height: 1.8;
+                padding: 6px 0;
+                padding-left: 20px;
+                position: relative;
+              ">
+                <span style="
+                  position: absolute;
+                  left: 0;
+                  top: 14px;
+                  width: 6px;
+                  height: 6px;
+                  background: var(--primary);
+                  border-radius: 50%;
+                "></span>
+                {item}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+    </div>
+  </main>
+  <RiskDisclaimer text={t.risk} />
+  <Footer footer={t.footer} />
+</BaseLayout>

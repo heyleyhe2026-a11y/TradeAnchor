@@ -1,0 +1,236 @@
+﻿---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+import RiskDisclaimer from '../components/RiskDisclaimer.astro';
+
+import { t as enT } from '../i18n/en';
+import { t as zhT } from '../i18n/zh';
+
+const lang = Astro.url.pathname.startsWith('/zh') ? 'zh' : 'en';
+const t = lang === 'zh' ? zhT : enT;
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
+
+const privacyContent = lang === 'zh'
+  ? {
+      title: '隐私政策',
+      lastUpdated: '最后更新：2026 年 6 月 5 日',
+      sections: [
+        {
+          heading: '1. 信息收集',
+          items: [
+            '我们收集您主动提供的信息：注册邮箱、用户名、头像、交易数据等。',
+            '我们自动收集的信息：设备类型、浏览器类型、IP 地址、访问日志、Cookie 数据。',
+            '我们收集的第三方信息：支付处理商提供的必要交易信息。',
+          ],
+        },
+        {
+          heading: '2. 信息使用',
+          items: [
+            '提供、维护和改进我们的服务。',
+            '处理交易和发送相关通知。',
+            '发送服务相关通讯（如安全警报、账户通知）。',
+            '分析平台使用情况以优化用户体验。',
+            '保护平台安全和防止欺诈行为。',
+          ],
+        },
+        {
+          heading: '3. 信息共享',
+          items: [
+            '我们不会出售您的个人信息。',
+            '除以下情形外，不会与第三方共享您的信息：(a) 获得您的明确同意；(b) 法律要求；(c) 为提供服务所必需的服务提供商（如支付网关）；(d) 保护本平台或用户的权利和安全。',
+          ],
+        },
+        {
+          heading: '4. Cookies 使用',
+          items: [
+            '我们使用 Cookies 和类似技术来记住您的偏好、分析网站流量、提供个性化体验。',
+            '您可以通过浏览器设置管理 Cookie 偏好，但这可能影响某些功能的正常使用。',
+          ],
+        },
+        {
+          heading: '5. 数据安全',
+          items: [
+            '我们采用行业标准的加密技术（TLS/SSL）保护数据传输。',
+            '敏感数据（如密码）采用哈希算法存储。',
+            '我们定期进行安全审查和渗透测试以保障系统安全。',
+          ],
+        },
+        {
+          heading: '6. 用户权利',
+          items: [
+            '您有权访问、更正或删除您的个人数据。',
+            '您可以导出您的数据副本。',
+            '您可以随时撤销对数据处理的同意。',
+            '您有权注销账户（请注意：删除后数据无法恢复）。',
+          ],
+        },
+        {
+          heading: '7. 数据保留',
+          items: [
+            '只要您的账户存在，我们将保留您的数据。',
+            '账户注销后 30 天内永久删除所有个人数据（法律要求的除外）。',
+            '匿名化/聚合的数据可能无限期保留用于统计分析。',
+          ],
+        },
+        {
+          heading: '8. 未成年用户',
+          items: [
+            '本服务面向 16 岁以上用户。我们不故意收集未满 16 岁用户的个人信息。',
+            '如发现我们无意中收集了未成年人的信息，请立即联系我们删除。',
+          ],
+        },
+        {
+          heading: '9. 政策变更',
+          items: [
+            '我们可能不时更新本隐私政策。重大变更时将通过邮件或在平台上发布通知。',
+            '建议您定期查阅本页面以了解最新信息。',
+          ],
+        },
+        {
+          heading: '10. 联系我们',
+          items: [
+            '如有任何隐私相关问题，请联系：privacy@mytradewiseoc.com',
+          ],
+        },
+      ],
+    }
+  : {
+      title: 'Privacy Policy',
+      lastUpdated: 'Last updated: June 5, 2026',
+      sections: [
+        {
+          heading: '1. Information We Collect',
+          items: [
+            'Information you provide: registration email, username, avatar, trade data, etc.',
+            'Information we automatically collect: device type, browser type, IP address, access logs, cookie data.',
+            'Third-party information: necessary transaction data from payment processors.',
+          ],
+        },
+        {
+          heading: '2. How We Use Your Information',
+          items: [
+            'To provide, maintain, and improve our services.',
+            'To process transactions and send related information.',
+            'To send service communications (e.g., security alerts, account notifications).',
+            'To analyze usage patterns to optimize user experience.',
+            'To protect platform security and prevent fraud.',
+          ],
+        },
+        {
+          heading: '3. Information Sharing',
+          items: [
+            'We do not sell your personal information.',
+            'We do not share your information with third parties except: (a) with your explicit consent; (b) as required by law; (c) with service providers necessary for service delivery (e.g., payment gateways); (d) to protect the rights and safety of the Platform or users.',
+          ],
+        },
+        {
+          heading: '4. Use of Cookies',
+          items: [
+            'We use cookies and similar technologies to remember preferences, analyze site traffic, and provide personalized experiences.',
+            'You can manage cookie preferences through browser settings, though this may affect certain features.',
+          ],
+        },
+        {
+          heading: '5. Data Security',
+          items: [
+            'We use industry-standard encryption (TLS/SSL) to protect data in transit.',
+            'Sensitive data (such as passwords) is stored using hashing algorithms.',
+            'We conduct regular security audits and penetration tests.',
+          ],
+        },
+        {
+          heading: '6. Your Rights',
+          items: [
+            'You have the right to access, correct, or delete your personal data.',
+            'You can request a copy of your data in a portable format.',
+            'You can withdraw consent for data processing at any time.',
+            'You have the right to delete your account (note: deletion is permanent).',
+          ],
+        },
+        {
+          heading: '7. Data Retention',
+          items: [
+            'We retain your data while your account exists.',
+            'After account deletion, all personal data is permanently deleted within 30 days (unless required by law).',
+            'Anonymized/aggregated data may be retained indefinitely for statistical analysis.',
+          ],
+        },
+        {
+          heading: '8. Minor Users',
+          items: [
+            'Our service is intended for users aged 16 and above. We do not knowingly collect personal information from children under 16.',
+            'If you believe we have inadvertently collected such information, please contact us immediately for removal.',
+          ],
+        },
+        {
+          heading: '9. Changes to This Policy',
+          items: [
+            'We may update this Privacy Policy from time to time. Material changes will be communicated via email or on-platform notice.',
+            'We encourage you to review this page periodically for the latest information.',
+          ],
+        },
+        {
+          heading: '10. Contact Us',
+          items: [
+            'For any privacy-related questions, please contact: privacy@mytradewiseoc.com',
+          ],
+        },
+      ],
+    };
+---
+
+<BaseLayout
+  title={privacyContent.title + ' - TradeAnchor'}
+  description={privacyContent.title}
+  canonicalUrl={canonicalUrl}
+>
+  <Navbar />
+  <main class="legal-page">
+    <div class="container" style="max-width: 800px; margin: 0 auto; padding: 80px 20px 40px;">
+      <header style="text-align: center; margin-bottom: 48px;">
+        <h1 style="font-size: 2.4rem; font-weight: 800; color: var(--text-primary); margin-bottom: 8px;">
+          {privacyContent.title}
+        </h1>
+        <p style="font-size: 0.9rem; color: var(--text-secondary);">{privacyContent.lastUpdated}</p>
+      </header>
+
+      {privacyContent.sections.map((section) => (
+        <section style="margin-bottom: 32px;">
+          <h2 style="
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary);
+            margin-bottom: 16px;
+          ">{section.heading}</h2>
+          <ul style="list-style: none; padding: 0; margin: 0;">
+            {section.items.map((item) => (
+              <li style="
+                color: var(--text-secondary);
+                line-height: 1.8;
+                padding: 6px 0;
+                padding-left: 20px;
+                position: relative;
+              ">
+                <span style="
+                  position: absolute;
+                  left: 0;
+                  top: 14px;
+                  width: 6px;
+                  height: 6px;
+                  background: var(--primary);
+                  border-radius: 50%;
+                "></span>
+                {item}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))}
+    </div>
+  </main>
+  <RiskDisclaimer text={t.risk} />
+  <Footer footer={t.footer} />
+</BaseLayout>

@@ -1,0 +1,57 @@
+﻿# TradeAnchor
+
+> TradeAnchor (https://mytradewiseoc.com) is a free-to-start AI-powered trading journal SaaS for forex, crypto, and stock traders.
+
+## What TradeAnchor Does
+
+TradeAnchor helps traders record trades, analyze performance, and improve discipline through AI-driven insights.
+
+Core capabilities:
+- Smart CSV/Excel import (MT4, MT5, crypto exchanges) with auto column mapping
+- Trade dashboard: P&L, win rate, profit factor, ROI, drawdown, calendar heatmap
+- AI Confidence scores: execution consistency, risk exposure, concentration risk, overtrading
+- Quick & Deep AI reports with follow-up Q&A on your trading data
+- Trading diary for emotions, setup notes, and lessons learned
+- Community Plaza to browse and publish trading strategies and ideas
+- Multi-currency display, subscription tiers (Free / Pro / Premium)
+
+## Who It Is For
+
+- Forex traders (EURUSD, XAUUSD, etc.)
+- Crypto traders (spot and futures, BTC, ETH, altcoins)
+- Stock and futures traders
+- Day traders, swing traders, and systematic traders who want data-driven improvement
+
+## Key Pages
+
+- Homepage: https://mytradewiseoc.com/
+- AI Trading Journal: https://mytradewiseoc.com/ai-trading-journal
+- Crypto Trading Journal: https://mytradewiseoc.com/crypto-trading-journal
+- Forex Trading Journal: https://mytradewiseoc.com/forex-trading-journal
+- Trading Journal: https://mytradewiseoc.com/trading-journal
+- Trade Diary: https://mytradewiseoc.com/trade-diary
+- Pricing: https://mytradewiseoc.com/pricing
+- Register (free): https://mytradewiseoc.com/register
+
+## Product Images
+
+- Hero preview: https://mytradewiseoc.com/og-image.png
+- Dashboard: https://mytradewiseoc.com/og-dashboard.png
+- Community Plaza: https://mytradewiseoc.com/og-community.png
+
+## Pricing (USD)
+
+- Free: $0 — up to 500 trades, 5 AI reports/month, dashboard, import, diary, community
+- Pro: $19/month — unlimited trades, 50 AI reports/month, AI follow-up
+- Premium: $29/month — 100 AI reports/month, advanced features
+
+## Legal
+
+- Terms: https://mytradewiseoc.com/terms
+- Privacy: https://mytradewiseoc.com/privacy
+- AI reports are for education and self-improvement only, not financial advice.
+
+## Contact
+
+- Website: https://mytradewiseoc.com
+- Support: Customer service bot inside the app (Settings → Customer Service)

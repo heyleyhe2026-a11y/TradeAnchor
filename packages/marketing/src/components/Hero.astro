@@ -1,0 +1,189 @@
+﻿---
+import en from '../i18n/en.ts';
+import zh from '../i18n/zh.ts';
+import DashboardMockup from './DashboardMockup.astro';
+
+interface Props {
+  lang?: 'en' | 'zh';
+}
+
+const { lang = 'en' } = Astro.props;
+const t = lang === 'zh' ? zh : en;
+const spaBase = '';
+---
+
+<section class="hero-section" id="hero">
+  <div class="container-xl hero-grid">
+    <!-- Left Content -->
+    <div class="hero-left">
+      <!-- Logo -->
+      <div class="hero-branding">
+        <div class="hero-logo-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:72px;height:72px;color:#0a0e17"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+        </div>
+        <div class="brand-text">
+          <h1 class="brand-name">TradeAnchor</h1>
+          <p class="brand-tagline">{t.hero.tagline}</p>
+        </div>
+      </div>
+
+      <h2 class="hero-title">{t.hero.titleLine1}</h2>
+      <h3 class="hero-subtitle">{t.hero.titleLine2}</h3>
+      <p class="hero-desc">{t.hero.subtitle}</p>
+
+      <!-- CTA Buttons -->
+      <div class="hero-ctas">
+        <a href={`${spaBase}/register`} class="btn btn-primary btn-lg">{t.hero.ctaStart} →</a>
+        <a href="#features" class="btn btn-outline btn-lg">{t.hero.ctaDemo}</a>
+      </div>
+
+      <!-- Highlight Pills -->
+      <div class="highlight-pills">
+        <div class="pill">
+          <span class="pill-title">{t.hero.highlight1Title}</span>
+          <span class="pill-desc">{t.hero.highlight1Desc}</span>
+        </div>
+        <div class="pill">
+          <span class="pill-title">{t.hero.highlight2Title}</span>
+          <span class="pill-desc">{t.hero.highlight2Desc}</span>
+        </div>
+        <div class="pill">
+          <span class="pill-title">{t.hero.highlight3Title}</span>
+          <span class="pill-desc">{t.hero.highlight3Desc}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right — Dashboard Mockup (enlarged) -->
+    <div class="hero-right">
+      <DashboardMockup lang={lang} />
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero-section {
+    padding-top: calc(var(--nav-height) + 40px);
+    padding-bottom: 20px;
+    min-height: calc(100vh - var(--nav-height));
+  }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.15fr;
+    gap: 2rem;
+    align-items: center;
+    min-height: calc(100vh - 160px);
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+  }
+
+  /* Branding */
+  .hero-branding {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .hero-logo-box {
+    width: 100px; height: 100px;
+    background: linear-gradient(135deg, #00d4aa 0%, #00a888 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .brand-name {
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1.15;
+    color: #fff;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    letter-spacing: -1px;
+  }
+  .brand-tagline {
+    font-size: 0.9rem;
+    letter-spacing: 3px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-top: 0.25rem;
+  }
+
+  .hero-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.15;
+    margin-bottom: 0.25rem;
+  }
+  .hero-subtitle {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1.15;
+    margin-bottom: 1.25rem;
+  }
+  .hero-desc {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    max-width: 520px;
+    line-height: 1.75;
+    margin-bottom: 1.5rem;
+  }
+
+  .hero-ctas {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 1.75rem;
+    flex-wrap: wrap;
+  }
+  .btn-lg {
+    padding: 0.85rem 1.75rem;
+    font-size: 1rem;
+    border-radius: var(--radius-sm);
+  }
+
+  .highlight-pills {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .pill {
+    flex: 1 1 160px;
+  }
+  .pill-title {
+    display: block;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .pill-desc {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 0.15rem;
+    line-height: 1.45;
+  }
+
+  .hero-right {
+    transform: scale(1.35);
+    transform-origin: center center;
+  }
+
+  @media (max-width: 1024px) {
+    .hero-grid {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+      padding-top: 3rem;
+    }
+    .hero-right {
+      transform: scale(1);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .hero-title { font-size: 2rem; }
+    .hero-subtitle { font-size: 1.6rem; }
+    .brand-name { font-size: 2.5rem; }
+    .hero-logo-box { width: 72px; height: 72px; }
+  }
+</style>

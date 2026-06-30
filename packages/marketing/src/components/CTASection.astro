@@ -1,0 +1,105 @@
+---
+import en from '../i18n/en.ts';
+import zh from '../i18n/zh.ts';
+
+interface Props {
+  lang?: 'en' | 'zh';
+}
+
+const { lang = 'en' } = Astro.props;
+const t = lang === 'zh' ? zh : en;
+const spaBase = '';
+---
+
+<section class="cta-section">
+  <div class="container">
+    <div class="cta-box">
+      <!-- Decorative blurs -->
+      <div class="blur blur-1"></div>
+      <div class="blur blur-2"></div>
+
+      <div class="cta-content">
+        <h2>{t.cta.title}</h2>
+        <p>{t.cta.description}</p>
+        <div class="cta-buttons">
+          <a href={`${spaBase}/register`} class="btn btn-primary btn-lg">{t.cta.buttonStart} →</a>
+          <a href={`${spaBase}/login`} class="btn btn-outline btn-lg">{t.cta.buttonLogin}</a>
+        </div>
+        <div class="trust-badges">
+          <span>{t.cta.trust1}</span>
+          <span>{t.cta.trust2}</span>
+          <span>{t.cta.trust3}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cta-section { padding: 4rem 0; }
+  .cta-box {
+    position: relative;
+    background: linear-gradient(
+      135deg,
+      rgba(0,60,70,0.7) 0%,
+      rgba(0,40,55,0.85) 50%,
+      rgba(10,20,35,0.9) 100%
+    );
+    border-radius: var(--radius-lg);
+    padding: 3.5rem 2rem;
+    text-align: center;
+    border: 1px solid rgba(0,212,170,0.12);
+    overflow: hidden;
+  }
+  /* Decorative blurs */
+  .blur {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    pointer-events: none;
+  }
+  .blur-1 {
+    top: -80px; right: -80px;
+    width: 300px; height: 300px;
+    background: rgba(0,212,170,0.04);
+  }
+  .blur-2 {
+    bottom: -60px; left: -60px;
+    width: 250px; height: 250px;
+    background: rgba(0,180,216,0.04);
+  }
+
+  .cta-content { position: relative; z-index: 1; }
+  .cta-content h2 {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 1rem;
+  }
+  .cta-content p {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    max-width: 540px;
+    margin: 0 auto 2rem;
+    line-height: 1.75;
+  }
+  .cta-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 0.85rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+  .btn-lg { padding: 0.85rem 1.75rem; font-size: 1rem; }
+
+  .trust-badges {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+  .trust-badges span {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+  }
+</style>

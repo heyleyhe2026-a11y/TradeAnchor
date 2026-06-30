@@ -1,0 +1,1 @@
+{"name": "@tradeanchor/marketing", "type": "module", "version": "1.0.0", "scripts": {"dev": "astro dev", "start": "astro dev", "build": "astro build", "preview": "astro preview"}, "dependencies": {"astro": "^4.16.0", "@astrojs/sitemap": "^3.2.1"}}

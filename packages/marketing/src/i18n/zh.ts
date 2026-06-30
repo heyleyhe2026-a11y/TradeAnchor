@@ -1,0 +1,101 @@
+﻿/** Chinese translations */
+const zh = {
+  meta: {
+    title: 'TradeAnchor – 智能交易日志平台 | 记录 · 分析 · 成长',
+    description: 'TradeAnchor 是专业的智能交易日志SaaS平台，集成交易记录管理、AI数据分析与社区知识库，帮助交易者记录、分析并持续成长。',
+    keywords: '交易日志, AI交易分析, 交易记录, 交易日记, 加密货币日志, 外汇日志, 股票交易记录, AI报告, 交易平台',
+    ogTitle: 'TradeAnchor – 智能交易日志平台',
+    ogDescription: '用AI驱动的洞察来记录、分析和提升你的交易。立即开始你的免费之旅。',
+  },
+  nav: { features: '功能特性', pricing: '价格方案', login: '登录', freeStart: '免费开始' },
+  hero: {
+    tagline: '智能交易日志工具',
+    titleLine1: '智能交易日志',
+    titleLine2: 'SaaS 平台',
+    subtitle: 'TradeAnchor 是一个专业的智能交易日志 SaaS 平台，集成了交易记录管理、AI 数据分析和社区知识库——帮助交易者记录·分析·成长。',
+    ctaStart: '免费试用',
+    ctaDemo: '查看功能',
+    closeLabel: '实时预览',
+    highlight1Title: '智能导入引擎',
+    highlight1Desc: '自动将 CSV/Excel 列映射到 TradeAnchor 字段，支持自定义映射。',
+    highlight2Title: '社区广场',
+    highlight2Desc: '在社区中浏览、阅读和发布帖子，与其他交易者分享见解。',
+    highlight3Title: 'AI 驱动报告',
+    highlight3Desc: '利用 AI 模型生成深度交易洞察和模式分析。',
+  },
+  features: {
+    sectionTitle: '掌握交易所需的一切',
+    sectionSubtitle: '从交易记录到 AI 分析 —— 全在一个强大的平台中。',
+    card1Title: '全面的交易追踪',
+    card1Desc: '记录每笔交易的详细信息，包括入场/出场价格、持仓方向、数量和盈亏统计。',
+    card2Title: 'AI 分析与洞察',
+    card2Desc: '利用多种 AI 模型分析你的交易模式，识别弱点并获得可操作的建议。',
+    card3Title: '交易日志与日记',
+    card3Desc: '在每笔交易或每个交易日之后记录你的想法、情绪和经验教训，持续改进。',
+    card4Title: '成长计划与奖励',
+    card4Desc: '通过任务成就赚取积分，攀登排行榜，让交易之旅更有动力。',
+    card5Title: '可视化日历视图',
+    card5Desc: '在交互式日历上查看所有交易活动，每天用颜色编码的盈亏指标显示。',
+    card6Title: '社区广场',
+    card6Desc: '探索多样化的社区帖子，阅读其他交易者的见解，或发布自己的内容分享专业知识。',
+  },
+  stats: {
+    registeredTraders: '注册用户',
+    tradesLogged: '已记录交易',
+    communityPosts: '社区帖子',
+    liveMetric: '平台实时数据',
+    brokerPresets: '券商导入预设',
+    brokerPresetsSub: 'MT4/MT5、cTrader、IBKR 等',
+    pricingTiers: '订阅方案',
+    pricingTiersSub: '免费版、专业版、高级版',
+  },
+  staticStats: [
+    { num: '8', label: '券商导入预设', sub: 'MT4/MT5、cTrader、IBKR 等' },
+    { num: '3', label: '订阅方案', sub: '免费版、专业版、高级版' },
+  ],
+  pricing: {
+    sectionTitle: '简单透明的定价',
+    sectionSubtitle: '免费开始。准备好时再升级。',
+    tiers: [
+      {
+        name: '免费版', price: '¥0', period: '/月',
+        features: ['手动录入交易', '基础分析面板', 'CSV / Excel 导入（最多500条）', '自由浏览与发布帖子', 'AI 交易回顾（5次/月）'],
+        highlighted: false,
+      },
+      {
+        name: 'Pro 版', price: '¥139', period: '/月',
+        features: ['手动录入交易', '基础分析面板', 'CSV / Excel 导入', 'AI 交易回顾（50次/月）', 'AI 追问对话（50次/月）', '自由浏览与发布帖子', '无限制附件下载'],
+        highlighted: true,
+      },
+      {
+        name: '高级版', price: '¥209', period: '/月',
+        features: ['手动录入交易', '基础分析面板', 'CSV / Excel 导入', 'AI 交易回顾（100次/月）', 'AI 追问对话（100次/月）', '自由浏览与发布帖子', '无限制附件下载'],
+        highlighted: false,
+      },
+    ],
+    buttonChoosePlan: '选择方案',
+  },
+  cta: {
+    title: '准备好改变你的交易了吗？',
+    description: '用 TradeAnchor 开始记录、分析并改进你的交易——免费起步，准备好后再升级。',
+    buttonStart: '开始你的免费旅程',
+    buttonLogin: '登录继续',
+    trust1: '银行级加密',
+    trust2: '符合 GDPR 标准',
+    trust3: '无需信用卡',
+  },
+  footer: {
+    brandTagline: '智能交易日志工具',
+    terms: '服务条款',
+    privacy: '隐私政策',
+    refund: '退款政策',
+    copyright: `© ${new Date().getFullYear()} TradeAnchor. 保留所有权利。`,
+  },
+  legal: {
+    riskTitle: '风险提示',
+    riskText: '交易涉及高风险金融活动。TradeAnchor 提供的工具仅供信息参考，不构成投资建议。过往表现不代表未来结果。请理性交易，切勿投入超出承受能力的资金。',
+  },
+};
+
+export default zh;
+export const t = zh;

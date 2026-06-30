@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tradewise-config
+  namespace: tradewise
+data:
+  NODE_ENV: "production"
+  LOG_LEVEL: "info"
+  PORT: "3000"
+  # Database URLs (secrets should be in Secret resource)
+  REDIS_HOST: "redis-service"
+  REDIS_PORT: "6379"
+  MONGODB_HOST: "mongodb-service"
+  MONGODB_PORT: "27017"
+  POSTGRES_HOST: "postgres-service"
+  POSTGRES_PORT: "5432"
+  POSTGRES_DB: "tradewise"
+  # CORS
+  CORS_ORIGIN: "https://mytradewiseoc.com"
+  # Session
+  SESSION_TIMEOUT: "1800"
+  # Rate limiting
+  RATE_LIMIT_WINDOW: "3600000"
+  RATE_LIMIT_MAX_REQUESTS: "1000"

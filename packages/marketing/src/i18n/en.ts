@@ -1,0 +1,101 @@
+﻿/** English translations — SEO optimized for Google indexing */
+const en = {
+  meta: {
+    title: 'TradeAnchor – AI-Powered Trading Journal Platform | Record · Analyze · Grow',
+    description: 'TradeAnchor is a smart trading journal SaaS platform with AI analytics, community knowledge base, and growth rewards. Track trades, get AI insights, and improve your performance.',
+    keywords: 'trading journal, AI trading analysis, trade tracker, trading diary, crypto journal, forex journal, stock trading log, AI reports, trading platform',
+    ogTitle: 'TradeAnchor – Smart Trading Journal Platform',
+    ogDescription: 'Record, analyze, and grow your trading with AI-powered insights. Start your free journey today.',
+  },
+  nav: { features: 'Features', pricing: 'Pricing', login: 'Sign In', freeStart: 'Start Free' },
+  hero: {
+    tagline: 'SMART TRADING JOURNAL TOOL',
+    titleLine1: 'Smart Trading Journal',
+    titleLine2: 'SaaS Platform',
+    subtitle: 'TradeAnchor is a professional smart trading journal SaaS platform integrating trade record management, AI-powered data analysis, and community knowledge base — helping traders Record · Analyze · Grow.',
+    ctaStart: 'Start Free Trial',
+    ctaDemo: 'View Features',
+    closeLabel: 'Live Preview',
+    highlight1Title: 'Smart Import Engine',
+    highlight1Desc: 'Auto-map CSV/Excel columns to TradeAnchor fields with custom mapping support.',
+    highlight2Title: 'Community Plaza',
+    highlight2Desc: 'Browse, read, and publish posts in the community. Share insights with fellow traders.',
+    highlight3Title: 'AI-Powered Reports',
+    highlight3Desc: 'Generate deep trading insights and pattern analysis with AI models.',
+  },
+  features: {
+    sectionTitle: 'Everything You Need to Master Trading',
+    sectionSubtitle: 'From trade recording to AI analysis — all in one powerful platform.',
+    card1Title: 'Comprehensive Trade Tracking',
+    card1Desc: 'Log every detail of your trades including entry/exit prices, position direction, quantity, and P&L statistics.',
+    card2Title: 'AI Analytics & Insights',
+    card2Desc: 'Leverage multiple AI models to analyze your trading patterns, identify weaknesses, and get actionable suggestions.',
+    card3Title: 'Trading Journal & Diary',
+    card3Desc: 'Record your thoughts, emotions, and lessons learned after each trade or trading day for continuous improvement.',
+    card4Title: 'Growth Plan & Rewards',
+    card4Desc: 'Earn credits through task achievements, climb the leaderboards, and make your trading journey more motivating.',
+    card5Title: 'Visual Calendar View',
+    card5Desc: 'See all your trading activity on an interactive calendar with color-coded profit/loss indicators per day.',
+    card6Title: 'Community Plaza',
+    card6Desc: 'Explore diverse community posts, read insights from fellow traders, or publish your own to share expertise.',
+  },
+  stats: {
+    registeredTraders: 'Registered Traders',
+    tradesLogged: 'Trades Logged',
+    communityPosts: 'Community Posts',
+    liveMetric: 'Live platform data',
+    brokerPresets: 'Broker Import Presets',
+    brokerPresetsSub: 'MT4/MT5, cTrader, IBKR & more',
+    pricingTiers: 'Pricing Tiers',
+    pricingTiersSub: 'Free, Pro & Premium',
+  },
+  staticStats: [
+    { num: '8', label: 'Broker Import Presets', sub: 'MT4/MT5, cTrader, IBKR & more' },
+    { num: '3', label: 'Pricing Tiers', sub: 'Free, Pro & Premium' },
+  ],
+  pricing: {
+    sectionTitle: 'Simple, Transparent Pricing',
+    sectionSubtitle: 'Start free. Upgrade when you\'re ready.',
+    tiers: [
+      {
+        name: 'Free', price: '$0', period: '/month',
+        features: ['Manual trade entry', 'Basic analytics dashboard', 'CSV / Excel import (up to 500 records)', 'Free browse & publish posts', 'AI-powered trade review (5/month)'],
+        highlighted: false,
+      },
+      {
+        name: 'Pro', price: '$19', period: '/month',
+        features: ['Manual trade entry', 'Basic analytics dashboard', 'CSV / Excel import', 'AI-powered trade review (50/month)', 'AI follow-up questions (50/month)', 'Free browse & publish posts', 'Unlimited attachment downloads'],
+        highlighted: true,
+      },
+      {
+        name: 'Premium', price: '$29', period: '/month',
+        features: ['Manual trade entry', 'Basic analytics dashboard', 'CSV / Excel import', 'AI-powered trade review (100/month)', 'AI follow-up questions (100/month)', 'Free browse & publish posts', 'Unlimited attachment downloads'],
+        highlighted: false,
+      },
+    ],
+    buttonChoosePlan: 'Choose Plan',
+  },
+  cta: {
+    title: 'Ready to Transform Your Trading?',
+    description: 'Start recording, analyzing, and improving your trading with TradeAnchor — free to begin, upgrade when you are ready.',
+    buttonStart: 'Start Your Free Journey',
+    buttonLogin: 'Sign In to Continue',
+    trust1: 'Bank-level encryption',
+    trust2: 'GDPR compliant',
+    trust3: 'No credit card required',
+  },
+  footer: {
+    brandTagline: 'Smart Trading Journal Tool',
+    terms: 'Terms of Service',
+    privacy: 'Privacy Policy',
+    refund: 'Refund Policy',
+    copyright: `© ${new Date().getFullYear()} TradeAnchor. All rights reserved.`,
+  },
+  legal: {
+    riskTitle: 'Risk Disclaimer',
+    riskText: 'Trading involves high financial risks. TradeAnchor provides tools for informational purposes only and does not constitute financial advice. Past performance does not guarantee future results. Please trade responsibly and never risk more than you can afford to lose.',
+  },
+};
+
+export default en;
+export const t = en;
