@@ -172,6 +172,7 @@ tradeanchor/
 
 ## 📄 Documentation
 
+- [docs/GITHUB_UPLOAD.md](docs/GITHUB_UPLOAD.md) — Safe upload to GitHub (secrets checklist)
 - [AI_MODELS_GUIDE.md](AI_MODELS_GUIDE.md) — AI provider integration guide
 - [CI_CD_MONITORING.md](CI_CD_MONITORING.md) — CI/CD and monitoring setup
 - [DEPLOYMENT.md](DEPLOYMENT.md) — Full deployment guide

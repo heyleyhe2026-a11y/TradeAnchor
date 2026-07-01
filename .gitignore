@@ -14,12 +14,11 @@ out/
 coverage/
 .nyc_output/
 
-# Environment variables
+# Environment variables (never commit real secrets)
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*
+!.env.example
+!**/.env.example
 
 # Logs
 logs/
@@ -52,10 +51,28 @@ Thumbs.db
 # Misc
 .turbo/
 .workbuddy/
+.codebuddy/
 
 # Sensitive / personal files
 # deploy.ps1 contains real server IP - do not commit
 deploy.ps1
+deploy.local.sh
+docker-compose.override.yml
+docker-compose.local.yml
+
+# SSH keys & certificates
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa
+id_rsa.*
+credentials.json
+credentials*.json
+**/secrets.json
+
+# K8s local secrets (use k8s/secret.yaml as template only)
+k8s/secret.local.yaml
 
 # AI development configuration
 .kiro/

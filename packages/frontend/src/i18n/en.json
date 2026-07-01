@@ -364,6 +364,42 @@
     "linkedCalendar": "Trading Calendar (Filtered)",
     "linkedCalendarTip": "Showing trades between selected dates",
     "recentCalendar": "Recent Trading Activity",
+    "chart": {
+      "title": "Symbol Chart",
+      "symbol": "Symbol",
+      "providerSymbol": "Data",
+      "cached": "cached",
+      "symbolPlaceholder": "e.g. XAUUSD, EURUSD, BTCUSD",
+      "symbolHint": "Type to search, then select a symbol",
+      "recentSymbols": "Your symbols",
+      "loadError": "Failed to load chart data",
+      "indicators": {
+        "sma20": "SMA 20",
+        "ema20": "EMA 20",
+        "bb20": "Bollinger Bands",
+        "rsi14": "RSI 14",
+        "macd": "MACD"
+      },
+      "ohlc": {
+        "open": "O",
+        "high": "H",
+        "low": "L",
+        "close": "C"
+      },
+      "crosshairOhlc": "Crosshair OHLC",
+      "crosshairSimple": "Price line",
+      "trendLineDraw": "Freehand draw",
+      "clearTrendLines": "Clear lines",
+      "trendLineHint": "Hold and drag to draw freely — length and shape are up to you",
+      "trendLineDragging": "Drawing…",
+      "trendLineColor": "Line color",
+      "trendLineActive": "Drawing mode",
+      "bid": "Bid",
+      "ask": "Ask",
+      "spread": "Spread",
+      "liveQuote": "Live",
+      "spreadEstimated": "est. spread"
+    },
     "aiConfidence": {
       "title": "AI Confidence Score",
       "hint": "Auto-analyzed from your trading data. For reference only, not financial advice.",
@@ -926,6 +962,10 @@
     "justNow": "Just now",
     "minAgo": "m ago",
     "hoursAgo": "h ago",
+    "newCommentTitle": "New Comment",
+    "commentReplyTitle": "Comment Reply",
+    "aiReportReadyTitle": "AI Report Ready",
+    "importCompleteTitle": "Trades Imported",
     "downloadRewardTitle": "🎉 Attachment Download Reward",
     "downloadRewardMsg": "User **{downloader}** downloaded attachment **\"{file}\"** from your post **\"{post}\"**, and you earned **+{points}** points!"
   },

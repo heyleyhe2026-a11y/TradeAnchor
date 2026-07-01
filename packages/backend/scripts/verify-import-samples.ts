@@ -9,8 +9,8 @@ import * as path from 'path';
 dotenv.config({ path: path.join(__dirname, '..', '.env') });
 
 const API = `http://localhost:${process.env.PORT || 3001}/api/v1`;
-const EMAIL = '1213129762@qq.com';
-const PASSWORD = 'Tradewise2026*';
+const EMAIL = process.env.SEED_TEST_EMAIL || 'free@example.com';
+const PASSWORD = process.env.SEED_PASSWORD || 'ChangeMeInDev123!';
 
 async function login(): Promise<string> {
   const res = await fetch(`${API}/auth/login`, {

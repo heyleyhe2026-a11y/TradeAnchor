@@ -367,7 +367,43 @@
     "numTrades": "交易次数",
     "linkedCalendar": "交易日历（筛选）",
     "linkedCalendarTip": "显示所选日期范围内的交易",
-    "recentCalendar": "近期活动"
+    "recentCalendar": "近期活动",
+    "chart": {
+      "title": "品种图表",
+      "symbol": "品种",
+      "providerSymbol": "数据源",
+      "cached": "缓存",
+      "symbolPlaceholder": "如 XAUUSD、EURUSD、BTCUSD",
+      "symbolHint": "输入关键词搜索并选择品种",
+      "recentSymbols": "你的品种",
+      "loadError": "图表数据加载失败",
+      "indicators": {
+        "sma20": "SMA 20",
+        "ema20": "EMA 20",
+        "bb20": "布林带",
+        "rsi14": "RSI 14",
+        "macd": "MACD"
+      },
+      "ohlc": {
+        "open": "开",
+        "high": "高",
+        "low": "低",
+        "close": "收"
+      },
+      "crosshairOhlc": "十字线 OHLC",
+      "crosshairSimple": "价格线",
+      "trendLineDraw": "自由画线",
+      "clearTrendLines": "清除线条",
+      "trendLineHint": "按住拖拽自由绘制，长短和形状由你决定",
+      "trendLineDragging": "绘制中…",
+      "trendLineColor": "线条颜色",
+      "trendLineActive": "绘制模式",
+      "bid": "卖出",
+      "ask": "买入",
+      "spread": "点差",
+      "liveQuote": "实时",
+      "spreadEstimated": "估算点差"
+    }
   },
   "trades": {
     "title": "交易记录",
@@ -916,6 +952,10 @@
     "justNow": "刚刚",
     "minAgo": "分钟前",
     "hoursAgo": "小时前",
+    "newCommentTitle": "新评论通知",
+    "commentReplyTitle": "评论回复通知",
+    "aiReportReadyTitle": "AI 报告已就绪",
+    "importCompleteTitle": "交易导入完成",
     "downloadRewardTitle": "🎉 附件下载奖励",
     "downloadRewardMsg": "用户 **{downloader}** 下载了您的帖子《**{post}**》中的附件 **「{file}」**，您获得了 **+{points}** 积分奖励！"
   },

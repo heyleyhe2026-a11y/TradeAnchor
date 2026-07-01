@@ -79,15 +79,19 @@ export class CommentService {
 
       if (notifyUserId) {
         const commenterName = comment.user?.displayName || comment.user?.email?.split('@')[0] || 'Anonymous';
+        const titleZh = notifType === 'new_comment' ? '新评论通知' : '评论回复通知';
+        const titleEn = notifType === 'new_comment' ? 'New Comment' : 'Comment Reply';
+        const msgZh = notifType === 'new_comment'
+          ? `${commenterName} 评论了你的帖子「${playbook.title}」`
+          : `${commenterName} 回复了你的评论`;
+        const msgEn = notifType === 'new_comment'
+          ? `${commenterName} commented on your post "${playbook.title}"`
+          : `${commenterName} replied to your comment`;
         notificationService.notify({
           type: notifType,
           userId: notifyUserId,
-          title: notifType === 'new_comment'
-            ? ('新评论通知' as string)
-            : ('评论回复通知' as string),
-          message: notifType === 'new_comment'
-            ? `${commenterName} 评论了你的帖子「${playbook.title}」`
-            : `${commenterName} 回复了你的评论`,
+          title: `${titleZh}|||${titleEn}`,
+          message: `${msgZh}|||${msgEn}`,
           metadata: {
             playbookId: data.playbookId,
             commentId: comment.id,

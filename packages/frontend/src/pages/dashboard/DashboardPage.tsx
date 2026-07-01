@@ -32,7 +32,7 @@ import BookIcon from '@mui/icons-material/Book';
 import AutoStoriesIcon from '@mui/icons-material/AutoStories';
 import { useGetDashboardStatsQuery } from '../../store/dashboardApi';
 import AiConfidenceCard from '../../components/AiConfidenceCard';
-import CalendarView from '../../components/CalendarView';
+import SymbolChartPanel from '../../components/SymbolChartPanel';
 import { fmtSignedCurrency, fmtCurrency, fmtPercent, fmtDollar } from '../../utils/format';
 import {
   ResponsiveContainer,
@@ -492,23 +492,9 @@ export default function DashboardPage() {
         </>
       )}
 
-      {/* Trading Calendar - Linked with all filters */}
+      {/* Symbol chart — symbols from imported trades */}
       <Box sx={{ mt: 4 }}>
-        <CalendarView
-          {...((dashStartDate || dashEndDate) ? {
-            dateRange: {
-              startDate: dashStartDate ? `${dashStartDate.getFullYear()}-${String(dashStartDate.getMonth()+1).padStart(2,'0')}-${String(dashStartDate.getDate()).padStart(2,'0')}` : undefined,
-              endDate: dashEndDate ? `${dashEndDate.getFullYear()}-${String(dashEndDate.getMonth()+1).padStart(2,'0')}-${String(dashEndDate.getDate()).padStart(2,'0')}` : undefined,
-            },
-            title: t('calendar.filteredCalendar', 'Calendar (Filtered)'),
-          } : {
-            months: 3,
-            title: t('calendar.recentCalendar', 'Recent Trading Activity'),
-          })}
-          hideRangeSelector={true}
-          symbolFilter={dashSymbolFilter || undefined}
-          directionFilter={dashDirectionFilter || undefined}
-        />
+        <SymbolChartPanel preferredSymbol={dashSymbolFilter || undefined} />
       </Box>
     </Box>
   );

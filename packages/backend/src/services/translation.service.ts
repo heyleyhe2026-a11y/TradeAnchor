@@ -1,7 +1,7 @@
 import { createHash } from 'crypto';
 import { prisma } from '../lib/prisma';
 import logger from '../lib/logger';
-import { aiProviderService, isModelAvailable, type AIModel } from './ai-provider.service';
+import { aiProviderService, isModelAvailable, MODEL_REGISTRY, type AIModel } from './ai-provider.service';
 import { ContentLocale, normalizeContentLocale, toApiLocale } from '../utils/locale.util';
 
 const TRANSLATION_MODEL = (process.env.TRANSLATION_MODEL || 'gpt-5-mini') as AIModel;
@@ -49,7 +49,16 @@ STRATEGY & MARKET TERMS
 
 When translating TO English: use standard international trading English (not overly formal).
 When translating TO Chinese: use terms Chinese traders use on forums like 雪球, 集思录, and FX communities.
+
+COMPLETENESS (critical)
+- Translate EVERY heading, subheading, bullet point, numbered item, and paragraph.
+- Never leave English sentences or section titles untranslated when the target is Chinese (and vice versa).
+- Keep the same document structure and section count as the source.
+
 Output ONLY valid JSON as requested — no markdown fences, no commentary.`;
+
+/** Long markdown fields are translated in chunks to avoid LLM output truncation. */
+const LONG_FIELD_CHUNK_CHARS = 1800;
 
 export type TranslationField = 'title' | 'description' | 'content' | 'paidContent';
 
@@ -64,6 +73,127 @@ export interface LocalizedMeta {
 
 function hashContent(text: string): string {
   return createHash('sha256').update(text).digest('hex');
+}
+
+function countCjkChars(text: string): number {
+  return (text.match(/[\u4e00-\u9fff\u3400-\u4dbf\uf900-\ufaff]/g) || []).length;
+}
+
+/** Lines that look like English headings or bullet prose (not tickers/code). */
+function countUntranslatedEnglishProseLines(text: string): number {
+  return text.split('\n').filter((line) => lineNeedsLocalePatch(line, 'zh')).length;
+}
+
+function lineNeedsLocalePatch(line: string, targetLocale: ContentLocale): boolean {
+  const trimmed = line.trim();
+  if (trimmed.length < 6) return false;
+  if (/^```/.test(trimmed)) return false;
+  if (/^!\[.*\]\([^)]+\)\s*$/.test(trimmed)) return false;
+  if (/^https?:\/\//.test(trimmed)) return false;
+
+  if (targetLocale === 'zh') {
+    if (/[\u4e00-\u9fff]/.test(trimmed)) return false;
+    return /[a-zA-Z]{3,}/.test(trimmed);
+  }
+
+  if (!/[\u4e00-\u9fff]/.test(trimmed)) return false;
+  return true;
+}
+
+function isLongTranslationField(field: string): boolean {
+  return field === 'content' || field === 'paidContent';
+}
+
+/** Split long markdown/text into chunks safe for a single LLM response. */
+export function splitTextForTranslation(text: string, maxChars = LONG_FIELD_CHUNK_CHARS): string[] {
+  const trimmed = text.trim();
+  if (!trimmed || trimmed.length <= maxChars) return [text];
+
+  const chunks: string[] = [];
+  const flush = (buf: string) => {
+    if (buf.trim()) chunks.push(buf);
+  };
+
+  const pushOversizedBlock = (block: string) => {
+    const paragraphs = block.split(/\n\n+/);
+    let paraBuf = '';
+    for (const para of paragraphs) {
+      const candidate = paraBuf ? `${paraBuf}\n\n${para}` : para;
+      if (candidate.length <= maxChars) {
+        paraBuf = candidate;
+        continue;
+      }
+      flush(paraBuf);
+      if (para.length <= maxChars) {
+        paraBuf = para;
+        continue;
+      }
+      for (let i = 0; i < para.length; i += maxChars) {
+        chunks.push(para.slice(i, i + maxChars));
+      }
+      paraBuf = '';
+    }
+    flush(paraBuf);
+  };
+
+  const sections = trimmed.split(/(?=\n#{1,4}\s)/);
+  let buffer = '';
+  for (const section of sections) {
+    if (section.length > maxChars) {
+      flush(buffer);
+      buffer = '';
+      pushOversizedBlock(section);
+    } else if ((buffer + section).length <= maxChars) {
+      buffer += section;
+    } else {
+      flush(buffer);
+      buffer = section;
+    }
+  }
+  flush(buffer);
+
+  return chunks.length > 0 ? chunks : [text];
+}
+
+/** Detect cached/partial translations that still contain too much source language. */
+export function isTranslationLikelyComplete(
+  source: string,
+  translated: string,
+  sourceLocale: ContentLocale,
+  targetLocale: ContentLocale,
+): boolean {
+  if (sourceLocale === targetLocale) return true;
+
+  const sourceLen = source.trim().length;
+  const translatedLen = translated.trim().length;
+  if (sourceLen < 120) return true;
+
+  const sourceCjk = countCjkChars(source);
+  const translatedCjk = countCjkChars(translated);
+  const sourceEnglishLines = countUntranslatedEnglishProseLines(source);
+
+  if (translatedLen < sourceLen * 0.45 && sourceLen > 800) return false;
+
+  if (targetLocale === 'zh' && sourceLocale === 'en') {
+    if (sourceCjk < sourceLen * 0.05 && translatedCjk < Math.min(sourceLen * 0.12, 80)) {
+      return false;
+    }
+    const remainingPatchLines = countUntranslatedEnglishProseLines(translated);
+    if (sourceEnglishLines >= 3 && remainingPatchLines >= 3) {
+      return false;
+    }
+    if (sourceEnglishLines >= 8 && remainingPatchLines >= Math.ceil(sourceEnglishLines * 0.15)) {
+      return false;
+    }
+  }
+
+  if (targetLocale === 'en' && sourceLocale === 'zh') {
+    if (sourceCjk > sourceLen * 0.2 && translatedCjk > translatedLen * 0.25) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 function isTranslationEnabled(): boolean {
@@ -102,6 +232,18 @@ async function getCachedTranslation(
   return row?.translated ?? null;
 }
 
+async function deleteCachedTranslation(
+  entityType: string,
+  entityId: string,
+  field: string,
+  targetLocale: ContentLocale,
+  sourceHash: string,
+): Promise<void> {
+  await prisma.contentTranslation.deleteMany({
+    where: { entityType, entityId, field, targetLocale, sourceHash },
+  });
+}
+
 async function saveTranslation(data: {
   entityType: string;
   entityId: string;
@@ -134,11 +276,26 @@ function parseJsonFromLlm(raw: string): Record<string, string> {
   const trimmed = raw.trim();
   const fenceMatch = trimmed.match(/```(?:json)?\s*([\s\S]*?)```/);
   const jsonStr = fenceMatch ? fenceMatch[1].trim() : trimmed;
-  const parsed = JSON.parse(jsonStr) as Record<string, string>;
-  if (!parsed || typeof parsed !== 'object') {
-    throw new Error('Invalid translation JSON');
+  try {
+    const parsed = JSON.parse(jsonStr) as Record<string, string>;
+    if (!parsed || typeof parsed !== 'object') {
+      throw new Error('Invalid translation JSON');
+    }
+    return parsed;
+  } catch (err) {
+    // Recover from truncated JSON: {"line_0":"...","line_1":"..."}
+    const partial: Record<string, string> = {};
+    const pairRe = /"(line_\d+)"\s*:\s*"((?:\\.|[^"\\])*)"/g;
+    let match: RegExpExecArray | null;
+    while ((match = pairRe.exec(jsonStr)) !== null) {
+      partial[match[1]] = match[2]
+        .replace(/\\n/g, '\n')
+        .replace(/\\"/g, '"')
+        .replace(/\\\\/g, '\\');
+    }
+    if (Object.keys(partial).length > 0) return partial;
+    throw err;
   }
-  return parsed;
 }
 
 async function callTranslationLlm(
@@ -155,6 +312,7 @@ async function callTranslationLlm(
     .map(([key, val]) => `--- ${key} ---\n${val}`)
     .join('\n\n');
 
+  const modelMaxTokens = MODEL_REGISTRY[TRANSLATION_MODEL]?.maxTokens ?? 4096;
   const response = await aiProviderService.generateCompletion(
     TRANSLATION_MODEL,
     [
@@ -164,14 +322,104 @@ async function callTranslationLlm(
         content: `Translate the following fields from ${localeLabel(sourceLocale)} to ${localeLabel(targetLocale)}.${symbolHint}
 
 Return a JSON object with the same keys: ${JSON.stringify(Object.keys(payload))}
+Each value must be a single-line JSON string (use \\n for line breaks inside a value if needed).
 
 ${fieldsDesc}`,
       },
     ],
-    { maxTokens: 8192 },
+    { maxTokens: modelMaxTokens },
   );
 
   return parseJsonFromLlm(response.content);
+}
+
+async function patchRemainingUntranslatedLines(
+  text: string,
+  sourceLocale: ContentLocale,
+  targetLocale: ContentLocale,
+  tradingSymbols?: string[],
+): Promise<string> {
+  if (sourceLocale === targetLocale) return text;
+
+  const lines = text.split('\n');
+  const indices = lines
+    .map((line, index) => (lineNeedsLocalePatch(line, targetLocale) ? index : -1))
+    .filter((index) => index >= 0);
+
+  if (indices.length === 0) return text;
+
+  const updated = [...lines];
+  const batchSize = 6;
+
+  for (let i = 0; i < indices.length; i += batchSize) {
+    const batchIndices = indices.slice(i, i + batchSize);
+    const payload: Record<string, string> = {};
+    batchIndices.forEach((idx, j) => {
+      payload[`line_${j}`] = lines[idx].trim();
+    });
+
+    try {
+      const translated = await callTranslationLlm(sourceLocale, targetLocale, payload, tradingSymbols);
+      batchIndices.forEach((idx, j) => {
+        const patched = translated[`line_${j}`]?.trim();
+        if (!patched) return;
+        if (targetLocale === 'zh' && !/[\u4e00-\u9fff]/.test(patched)) return;
+        const indent = lines[idx].match(/^(\s*)/)?.[1] || '';
+        updated[idx] = indent + patched;
+      });
+    } catch (err) {
+      logger.warn('Patch translation batch failed, trying line-by-line', {
+        batchSize: batchIndices.length,
+        error: err instanceof Error ? err.message : err,
+      });
+      for (const idx of batchIndices) {
+        try {
+          const single = await callTranslationLlm(
+            sourceLocale,
+            targetLocale,
+            { line: lines[idx].trim() },
+            tradingSymbols,
+          );
+          const patched = single.line?.trim();
+          if (!patched) continue;
+          if (targetLocale === 'zh' && !/[\u4e00-\u9fff]/.test(patched)) continue;
+          const indent = lines[idx].match(/^(\s*)/)?.[1] || '';
+          updated[idx] = indent + patched;
+        } catch (lineErr) {
+          logger.warn('Patch translation line failed', {
+            line: lines[idx].trim().slice(0, 80),
+            error: lineErr instanceof Error ? lineErr.message : lineErr,
+          });
+        }
+      }
+    }
+  }
+
+  return updated.join('\n');
+}
+
+async function translateTextField(
+  field: TranslationField,
+  text: string,
+  sourceLocale: ContentLocale,
+  targetLocale: ContentLocale,
+  tradingSymbols?: string[],
+): Promise<string> {
+  const chunks = splitTextForTranslation(text);
+  let result: string;
+  if (chunks.length === 1) {
+    const single = await callTranslationLlm(sourceLocale, targetLocale, { [field]: text }, tradingSymbols);
+    result = single[field]?.trim() || text;
+  } else {
+    const translatedParts: string[] = [];
+    for (const chunk of chunks) {
+      const part = await callTranslationLlm(sourceLocale, targetLocale, { [field]: chunk }, tradingSymbols);
+      translatedParts.push(part[field]?.trim() || chunk);
+    }
+    result = translatedParts.join('');
+  }
+
+  return patchRemainingUntranslatedLines(result, sourceLocale, targetLocale, tradingSymbols);
 }
 
 async function translateFields(
@@ -191,10 +439,13 @@ async function translateFields(
     const sourceHash = hashContent(text);
     const cached = await getCachedTranslation(entityType, entityId, field, targetLocale, sourceHash);
     if (cached != null) {
-      result[field] = cached;
-    } else {
-      toTranslate[field] = text;
+      if (isTranslationLikelyComplete(text, cached, sourceLocale, targetLocale)) {
+        result[field] = cached;
+        continue;
+      }
+      await deleteCachedTranslation(entityType, entityId, field, targetLocale, sourceHash);
     }
+    toTranslate[field] = text;
   }
 
   if (Object.keys(toTranslate).length === 0) return result;
@@ -207,10 +458,18 @@ async function translateFields(
     return result;
   }
 
-  try {
-    const translated = await callTranslationLlm(sourceLocale, targetLocale, toTranslate, tradingSymbols);
-    for (const [field, original] of Object.entries(toTranslate)) {
-      const text = translated[field]?.trim() || original;
+  for (const [field, original] of Object.entries(toTranslate)) {
+    try {
+      const text = isLongTranslationField(field)
+        ? await translateTextField(field as TranslationField, original, sourceLocale, targetLocale, tradingSymbols)
+        : (await callTranslationLlm(sourceLocale, targetLocale, { [field]: original }, tradingSymbols))[field]?.trim() || original;
+
+      if (!isTranslationLikelyComplete(original, text, sourceLocale, targetLocale)) {
+        logger.warn('Translation quality check failed, using original text', { entityType, entityId, field });
+        result[field] = original;
+        continue;
+      }
+
       result[field] = text;
       await saveTranslation({
         entityType,
@@ -221,15 +480,14 @@ async function translateFields(
         sourceHash: hashContent(original),
         translated: text,
       });
-    }
-  } catch (err) {
-    logger.error('LLM translation failed, falling back to original', {
-      entityType,
-      entityId,
-      error: err instanceof Error ? err.message : err,
-    });
-    for (const [field, text] of Object.entries(toTranslate)) {
-      result[field] = text;
+    } catch (err) {
+      logger.error('LLM translation failed for field, falling back to original', {
+        entityType,
+        entityId,
+        field,
+        error: err instanceof Error ? err.message : err,
+      });
+      result[field] = original;
     }
   }
 

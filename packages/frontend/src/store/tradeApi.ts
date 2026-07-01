@@ -1,4 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+import { marketApi, MARKET_SYMBOLS_TAG } from './marketApi';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api/v1';
 
@@ -111,6 +112,19 @@ export interface ImportTradesResult {
   errors: string[];
 }
 
+/** Refresh chart "Your symbols" after trade records change. */
+async function refreshMarketSymbolsOnTradeChange(
+  _: unknown,
+  { dispatch, queryFulfilled }: { dispatch: (action: unknown) => void; queryFulfilled: Promise<unknown> },
+) {
+  try {
+    await queryFulfilled;
+    dispatch(marketApi.util.invalidateTags([MARKET_SYMBOLS_TAG]));
+  } catch {
+    // mutation failed — keep existing symbol list
+  }
+}
+
 export const tradeApi = createApi({
   reducerPath: 'tradeApi',
   baseQuery: fetchBaseQuery({
@@ -144,6 +158,7 @@ export const tradeApi = createApi({
     createTrade: builder.mutation<Trade, CreateTradeRequest>({
       query: (trade) => ({ url: '/trades', method: 'POST', body: trade }),
       invalidatesTags: [{ type: 'Trade', id: 'LIST' }, { type: 'Dashboard' }],
+      onQueryStarted: refreshMarketSymbolsOnTradeChange,
     }),
 
     updateTrade: builder.mutation<Trade, { id: string; data: UpdateTradeRequest }>({
@@ -153,16 +168,19 @@ export const tradeApi = createApi({
         { type: 'Trade', id: 'LIST' },
         { type: 'Dashboard' },
       ],
+      onQueryStarted: refreshMarketSymbolsOnTradeChange,
     }),
 
     deleteTrade: builder.mutation<void, string>({
       query: (id) => ({ url: `/trades/${id}`, method: 'DELETE' }),
       invalidatesTags: [{ type: 'Trade', id: 'LIST' }, { type: 'Dashboard' }],
+      onQueryStarted: refreshMarketSymbolsOnTradeChange,
     }),
 
     batchDeleteTrades: builder.mutation<{ deleted: number }, string[]>({
       query: (ids) => ({ url: '/trades', method: 'DELETE', body: { ids } }),
       invalidatesTags: [{ type: 'Trade', id: 'LIST' }, { type: 'Dashboard' }],
+      onQueryStarted: refreshMarketSymbolsOnTradeChange,
     }),
 
     batchUpdateLeverage: builder.mutation<{ updated: number }, { ids: string[]; leverage: number }>({
@@ -172,8 +190,8 @@ export const tradeApi = createApi({
 
     importTrades: builder.mutation<ImportTradesResult, ImportTradesRequest>({
       query: (body) => ({ url: '/trades/import', method: 'POST', body }),
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      invalidatesTags: [{ type: 'Trade' as any, id: 'LIST' }],
+      invalidatesTags: [{ type: 'Trade', id: 'LIST' }, { type: 'Dashboard' }],
+      onQueryStarted: refreshMarketSymbolsOnTradeChange,
     }),
   }),
 });

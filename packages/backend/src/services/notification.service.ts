@@ -1,4 +1,4 @@
-﻿import { prisma } from '../lib/prisma';
+import { prisma } from '../lib/prisma';
 import { getCollection, MongoCollections } from '../lib/mongodb';
 import logger from '../lib/logger';
 import { randomUUID } from 'crypto';
@@ -118,11 +118,15 @@ class NotificationService {
    * Convenience method: notify AI report ready
    */
   async notifyAiReportReady(userId: string, reportId: string, model: string): Promise<void> {
+    const titleZh = 'AI 报告已就绪';
+    const titleEn = 'AI Report Ready';
+    const msgZh = `您的交易分析报告（${model}）已生成，可以查看。`;
+    const msgEn = `Your trading analysis report (${model}) has been generated and is ready to view.`;
     return this.notify({
       type: 'ai_report_ready',
       userId,
-      title: 'AI Report Ready',
-      message: `Your trading analysis report (${model}) has been generated and is ready to view.`,
+      title: `${titleZh}|||${titleEn}`,
+      message: `${msgZh}|||${msgEn}`,
       metadata: { reportId, model },
     });
   }
@@ -131,17 +135,23 @@ class NotificationService {
    * Convenience method: notify trade import completion (single summary instead of per-trade)
    */
   async notifyImportComplete(userId: string, importedCount: number, failedCount: number): Promise<void> {
-    const title = failedCount > 0
+    const titleZh = failedCount > 0
+      ? `交易导入完成：成功 ${importedCount} 条，失败 ${failedCount} 条`
+      : `已导入 ${importedCount} 条交易记录`;
+    const titleEn = failedCount > 0
       ? `Trades Imported: ${importedCount} succeeded, ${failedCount} failed`
       : `${importedCount} Trades Imported`;
-    const message = failedCount > 0
+    const msgZh = failedCount > 0
+      ? `成功导入 ${importedCount} 条交易记录，${failedCount} 条因错误被跳过。`
+      : `成功导入 ${importedCount} 条交易记录。`;
+    const msgEn = failedCount > 0
       ? `Successfully imported ${importedCount} trade(s). ${failedCount} record(s) were skipped due to errors.`
       : `Successfully imported ${importedCount} trade(s).`;
     return this.notify({
       type: 'import_complete',
       userId,
-      title,
-      message,
+      title: `${titleZh}|||${titleEn}`,
+      message: `${msgZh}|||${msgEn}`,
       metadata: { importedCount, failedCount },
     });
   }

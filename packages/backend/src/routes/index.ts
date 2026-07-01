@@ -17,6 +17,7 @@ import fxRoutes from './fx.routes';
 import notificationRoutes from './notification.routes';
 import webhookRoutes from './webhook.routes';
 import publicRoutes from './public.routes';
+import marketRoutes from './market.routes';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const router: any = Router();
@@ -37,6 +38,7 @@ router.use('/export', exportRoutes);
 router.use('/preferences', preferencesRoutes);
 router.use('/fx', fxRoutes);
 router.use('/notifications', notificationRoutes);
+router.use('/market', marketRoutes);
 router.use('/webhooks', webhookRoutes);
 router.use('/public', publicRoutes);
 
@@ -52,6 +54,7 @@ router.get('/', (req: any, res: any) => {
       playbooks: '/api/v1/playbooks', subscriptions: '/api/v1/subscriptions',
       payments: '/api/v1/payments', credits: '/api/v1/credits',
       export: '/api/v1/export', preferences: '/api/v1/preferences',
+      market: '/api/v1/market',
       health: '/health',
     },
   });

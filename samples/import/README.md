@@ -45,11 +45,15 @@
 
 ## 测试账号
 
-| 邮箱 | 密码 | 套餐 |
-|------|------|------|
-| `1213129762@qq.com` | `Tradewise2026*` | Free |
-| `yuercrystal@126.com` | `Tradewise2026*` | Pro |
-| `heyleyhe2026@gmail.com` | `Tradewise2026*` | Premium |
+运行 `pnpm db:seed` 后会创建三个本地测试账号（见 `packages/backend/prisma/seed.ts`）：
+
+| 邮箱 | 套餐 |
+|------|------|
+| `free@example.com` | Free |
+| `pro@example.com` | Pro |
+| `premium@example.com` | Premium |
+
+密码由环境变量 `SEED_PASSWORD` 控制，默认 `ChangeMeInDev123!`（仅用于本地开发）。
 
 ## 说明与后续计划
 

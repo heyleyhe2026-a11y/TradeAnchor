@@ -8,8 +8,7 @@ import path from 'path';
 // Load .env file explicitly from backend directory
 dotenv.config({ path: path.join(__dirname, '..', '.env') });
 
-// Debug: Check if DATABASE_URL is loaded
-console.log('DATABASE_URL:', process.env.DATABASE_URL);
+const SEED_PASSWORD = process.env.SEED_PASSWORD || 'ChangeMeInDev123!';
 
 // Create a connection pool for PostgreSQL
 const pool = new Pool({
@@ -26,22 +25,22 @@ const prisma = new PrismaClient({
 
 const TEST_USERS = [
   {
-    email: '1213129762@qq.com',
-    password: 'Tradewise2026*',
+    email: 'free@example.com',
+    password: SEED_PASSWORD,
     tier: 'free' as const,
     countryCode: 'CN',
     locale: 'zh',
   },
   {
-    email: 'yuercrystal@126.com',
-    password: 'Tradewise2026*',
+    email: 'pro@example.com',
+    password: SEED_PASSWORD,
     tier: 'pro' as const,
     countryCode: 'CN',
     locale: 'zh',
   },
   {
-    email: 'heyleyhe2026@gmail.com',
-    password: 'Tradewise2026*',
+    email: 'premium@example.com',
+    password: SEED_PASSWORD,
     tier: 'prem' as const,
     countryCode: 'US',
     locale: 'en',

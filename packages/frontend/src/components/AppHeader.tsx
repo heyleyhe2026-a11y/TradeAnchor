@@ -167,6 +167,27 @@ export default function AppHeader({ sidebarOpen, onSidebarToggle }: AppHeaderPro
     return text;
   };
 
+  /** Resolve notification title for current UI locale (handles bilingual + legacy single-language records) */
+  const getNotificationTitle = (notif: { type: string; title: string }): string => {
+    if (notif.title?.includes('|||')) {
+      return getLocalizedText(notif.title);
+    }
+    switch (notif.type) {
+      case 'new_comment':
+        return t('notification.newCommentTitle', 'New Comment');
+      case 'comment_reply':
+        return t('notification.commentReplyTitle', 'Comment Reply');
+      case 'ai_report_ready':
+        return t('notification.aiReportReadyTitle', 'AI Report Ready');
+      case 'import_complete':
+        return t('notification.importCompleteTitle', 'Trades Imported');
+      case 'attachment_download_reward':
+        return t('notification.downloadRewardTitle', '🎉 Attachment Download Reward');
+      default:
+        return getLocalizedText(notif.title);
+    }
+  };
+
   // Notification queries
   const { data: notifData, isLoading: notifLoading } = useNotifQuery({ limit: 10 }, { skip: !hasToken, pollingInterval: 30000 });
   const { data: unreadData } = useUnreadQuery(undefined, { skip: !hasToken, pollingInterval: 30000 });
@@ -357,7 +378,7 @@ export default function AppHeader({ sidebarOpen, onSidebarToggle }: AppHeaderPro
                           fontSize: '0.82rem', lineHeight: 1.35,
                           overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                         }}                        >
-                          {getLocalizedText(notif.title)}
+                          {getNotificationTitle(notif)}
                         </Typography>
                       }
                       secondary={

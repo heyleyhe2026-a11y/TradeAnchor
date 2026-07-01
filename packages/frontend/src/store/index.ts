@@ -12,6 +12,7 @@ import creditApi from './creditApi';
 import preferencesApi from './preferencesApi';
 import taskApi from './taskApi';
 import { notificationApi } from './notificationApi';
+import { marketApi } from './marketApi';
 
 export const store = configureStore({
   reducer: {
@@ -27,6 +28,7 @@ export const store = configureStore({
     [preferencesApi.reducerPath]: preferencesApi.reducer,
     [taskApi.reducerPath]: taskApi.reducer,
     [notificationApi.reducerPath]: notificationApi.reducer,
+    [marketApi.reducerPath]: marketApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -35,6 +37,7 @@ export const store = configureStore({
       diaryApi.middleware, playbookApi.middleware, subscriptionApi.middleware,
       creditApi.middleware, preferencesApi.middleware,
       taskApi.middleware, notificationApi.middleware,
+      marketApi.middleware,
     ),
 });
 
