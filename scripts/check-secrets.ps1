@@ -44,14 +44,14 @@ foreach ($p in $patterns) {
     }
 }
 
-# 4. Hardcoded dev password
-$seedHits = git grep -n "Tradewise2026" -- ':!node_modules' 2>$null
+# 4. Hardcoded dev password (exclude this scanner script — it mentions the pattern by name)
+$seedHits = git grep -n "Tradewise2026" -- ':!node_modules' ':!scripts/check-secrets.ps1' 2>$null
 if ($seedHits) {
     $failures += "Hardcoded password 'Tradewise2026' in tracked files:`n  $($seedHits -join "`n  ")"
 }
 
-# 5. Real personal emails in seed/docs (optional hygiene)
-$personalEmailHits = git grep -n "1213129762@qq.com" 2>$null
+# 5. Real personal emails in seed/docs (exclude this scanner script)
+$personalEmailHits = git grep -n "1213129762@qq.com" -- ':!scripts/check-secrets.ps1' 2>$null
 if ($personalEmailHits) {
     $failures += "Personal email in tracked files:`n  $($personalEmailHits -join "`n  ")"
 }
